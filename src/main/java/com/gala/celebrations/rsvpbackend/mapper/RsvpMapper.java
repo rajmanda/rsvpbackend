@@ -11,7 +11,7 @@ public interface RsvpMapper {
 
     RsvpMapper INSTANCE = Mappers.getMapper(RsvpMapper.class);
 
-    Rsvp mapRsvpDTOToRsvp(RsvpDTO rsvpDTO);
+    Rsvp mapRsvpDTOToRsvp(RsvpDTO RsvpDetails);
     RsvpDTO mapRsvpToRsvpDTO(Rsvp rsvp);
 
 }
