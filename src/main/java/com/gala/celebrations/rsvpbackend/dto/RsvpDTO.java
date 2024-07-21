@@ -9,21 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RsvpDTO {
 
-
     private Integer rsvpId;
-
-    // Info of Gala
-    private String description ;
-    private String id ;
-    private String name;
-    private String date ;
-    private String image;
-    private String location;
-
-    //info of User
-    private String rsvp ;
-    private int adults ;
-    private int children ;
-
+    private RsvpDetails RsvpDetails;
 
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RsvpDTOFromFE {
+public class RsvpDetails {
 
 
     // Info of Gala
