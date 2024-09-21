@@ -19,6 +19,8 @@ public class RsvpDetails {
     private String location;
 
     //info of User
+    private String userName;
+    private String userEmail;
     private String rsvp ;
     private int adults ;
     private int children ;
