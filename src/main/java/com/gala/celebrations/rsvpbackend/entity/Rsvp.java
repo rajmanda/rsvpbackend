@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Rsvp {
     private int rsvpId;
-    private RsvpDetails RsvpDetails;
+    private RsvpDetails rsvpDetails;
 
 }

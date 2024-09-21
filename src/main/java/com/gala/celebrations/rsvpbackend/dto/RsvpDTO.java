@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class RsvpDTO {
 
     private Integer rsvpId;
-    private RsvpDetails RsvpDetails;
+    private RsvpDetails rsvpDetails;
 
 }
