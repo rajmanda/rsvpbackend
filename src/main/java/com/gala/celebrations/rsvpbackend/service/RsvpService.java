@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +22,14 @@ public class RsvpService {
     SequenceGenerator sequenceGenerator;
 
     public RsvpDTO saveRsvpInDB(RsvpDetails rsvpDetails) {
+        // Check for an existing record (excluding the RSVP ID)
+        Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmail(rsvpDetails.getName(),rsvpDetails.getUserEmail());
+        if (existingRsvp.isPresent()) {
+            // Deactivate the existing entry
+            Rsvp oldRsvp = existingRsvp.get();
+            //oldRsvp.setActive(false); // Assuming there's an 'active' field
+            rsvpRepo.deleteByRsvpId(oldRsvp.getRsvpId()); // Update the existing entry
+        }
 
         int rsvpId = sequenceGenerator.generateNextRsvpId();
         Rsvp rsvpToBeSaved =  new Rsvp(rsvpId, rsvpDetails);
@@ -37,5 +46,9 @@ public class RsvpService {
 
     private RsvpDTO convertToDto(Rsvp rsvp) {
         return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvp);
+    }
+
+    public void deleteRsvp(int rsvpId) {
+        rsvpRepo.deleteByRsvpId(rsvpId);
     }
 }
