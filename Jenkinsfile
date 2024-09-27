@@ -8,7 +8,8 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                git url: 'git@github.com:your-user/your-repo.git', credentialsId: "${GIT_CREDENTIALS}"
+                // Securely pass credentialsId without interpolation
+                git url: 'git@github.com:your-user/your-repo.git', credentialsId: 'GIT_CREDENTIALS'
             }
         }
         stage('Build') {
