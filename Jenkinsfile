@@ -9,7 +9,7 @@ pipeline {
         stage('Clone repository') {
             steps {
                 // Securely pass credentialsId without interpolation
-                git url: 'git@github.com:your-user/your-repo.git', credentialsId: 'GIT_CREDENTIALS'
+                git url: 'git@github.com:rajmanda/rsvpbackend.git', credentialsId: 'GIT_CREDENTIALS'
             }
         }
         stage('Build') {
