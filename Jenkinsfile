@@ -3,6 +3,9 @@ pipeline {
 
     environment {
         GIT_CREDENTIALS = credentials('GIT_CREDENTIALS')
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'     // Ensure this matches the Dockerfile
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"  // Ensure Maven and Java are in PATH
+
     }
 
     stages {
