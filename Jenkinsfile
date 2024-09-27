@@ -23,9 +23,12 @@ pipeline {
             }
         }
         stage('Build') {
-            steps {
-                // Run Maven clean and package
-                sh 'mvn clean package'
+           steps {
+                sh 'echo $JAVA_HOME'
+                sh 'java -version'
+                sh 'mvn -version'
+                // Ensure JAVA_HOME is used by Maven
+                sh 'JAVA_HOME=$JAVA_HOME mvn clean package'
             }
         }
     }
