@@ -1,11 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'jenkins'
+        }
+    }
 
     environment {
-        GIT_CREDENTIALS = credentials('GIT_CREDENTIALS')
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'     // Ensure this matches the Dockerfile
-        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"  // Ensure Maven and Java are in PATH
-
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+        MAVEN_HOME = '/usr/share/maven'
+        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"
     }
 
     stages {
