@@ -1,11 +1,11 @@
 pipeline {
     agent any
 
-    environment {
-        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
-        MAVEN_HOME = '/usr/share/maven'
-        PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"
-    }
+//     environment {
+//         JAVA_HOME = '/usr/lib/jvm/java-17-openjdk-amd64'
+//         MAVEN_HOME = '/usr/share/maven'
+//         PATH = "${JAVA_HOME}/bin:${MAVEN_HOME}/bin:${PATH}"
+//     }
 
     stages {
         stage('Clone repository') {
