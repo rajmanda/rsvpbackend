@@ -23,12 +23,26 @@ pipeline {
         }
         stage('Build') {
            steps {
-                sh 'echo $JAVA_HOME'
-                sh 'java -version'
-                sh 'mvn -version'
-                // Ensure JAVA_HOME is used by Maven
-                sh 'JAVA_HOME=$JAVA_HOME mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
+         stage('Test') {
+            steps {
+                 sh 'mvn test'
+             }
+         }
+
+          stage('Docker Build and Push') {
+           steps {
+               sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+               sh 'docker build -t codedecode25/restaurant-listing-service:${VERSION} .'
+               sh 'docker push codedecode25/restaurant-listing-service:${VERSION}'
+           }
+         }
+
+          stage('Cleanup Workspace') {
+           steps {
+             deleteDir()
+           }
     }
 }
