@@ -54,4 +54,5 @@ jobs:
           git commit -m "Update Docker image to latest version"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}  # Use your new secret here
+
