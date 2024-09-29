@@ -46,6 +46,10 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:latest
+          platforms: linux/amd64,linux/arm64  # Specify the platforms you want to support
+          build-args: |
+            NODE_ENV=production
+          progress: plain
 
   update-manifest:
     runs-on: ubuntu-latest
