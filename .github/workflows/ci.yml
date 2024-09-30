@@ -45,7 +45,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:${{ github.run_number }}
           platforms: linux/amd64,linux/arm64  # Specify the platforms you want to support
           build-args: |
             NODE_ENV=production
@@ -61,7 +61,8 @@ jobs:
       # Step 2: Update the image in the deployment manifest
       - name: Update Kubernetes manifest
         run: |
-          sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:latest|' rsvpbackend-deployment.yaml
+          #sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:latest|' rsvpbackend-deployment.yaml
+          sed -i "s/image: .*/image:${{ secrets.DOCKERHUB_USERNAME }}\\/rsvpbackend:${{ github.run_number }}/" rsvpbackend-deployment.yaml
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add rsvpbackend-deployment.yaml
