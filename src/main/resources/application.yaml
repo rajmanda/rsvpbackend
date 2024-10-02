@@ -1,8 +1,9 @@
-#server:
-#  port: 9094
-#
-#spring:
-#  profiles:
-#    active: dev
-#  application:
-#    name: RSVP-BACKEND-SERVICE
+eureka:
+  client:
+    enabled: false
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://amirrajAdmin:Guruji2024@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: galadb
