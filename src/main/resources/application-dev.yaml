@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+eureka:
+  client:
+    enabled: false
+
+spring:
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      uri: mongodb+srv://amirrajAdmin:Guruji2024@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: galadb
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, env, loggers, heapdump, threaddump, scheduledtasks, beans, caches
+  health:
+    mongodb:
+      enabled: true  # Enable MongoDB health check
