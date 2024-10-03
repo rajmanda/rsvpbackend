@@ -61,7 +61,7 @@ jobs:
       # Step 2: Update the image in the deployment manifest
       - name: Update Kubernetes manifest
         run: |
-          sed -i "s|image: .*|image: ${secrets.DOCKERHUB_USERNAME}/rsvpbackend:${GITHUB_RUN_NUMBER}|" rsvpbackend-deployment.yaml
+          sed -i "s/image: .*/image: ${{ secrets.DOCKERHUB_USERNAME }}\\/rsvpbackend:${{ github.run_number }}/" rsvpbackend-deployment.yaml
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add rsvpbackend-deployment.yaml
