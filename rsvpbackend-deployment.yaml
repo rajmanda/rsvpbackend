@@ -1,51 +1,59 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rsvpbackendapp
+  name: rsvpbackend
+  namespace: kalyanam
   labels:
-    app: rsvpbackendapp
+    app: rsvpbackend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rsvpbackendapp
+      app: rsvpbackend
   template:
     metadata:
       labels:
-        app: rsvpbackendapp
+        app: rsvpbackend
     spec:
+      # securityContext:
+      #   runAsUser: 1000  # Specify the user ID
+      #   runAsGroup: 3000  # Specify the group ID
+      #   fsGroup: 2000     # Specify the file system group
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}  # Create a writable empty directory
+
       containers:
-        - name: rsvpbackendapp
-          image: dockerrajmanda/rsvpbackend:25
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 9091
-          env:
-            - name: SPRING_DATASOURCE_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: secret
-                  key: mysql-username
-            - name: SPRING_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: secret
-                  key: mysql-password
-            - name: SPRING_DATASOURCE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: configmap
-                  key: restaurantdb_url
+      - name: rsvpbackend
+        image: dockerrajmanda/rsvpbackend:25
+        ports:
+        - containerPort: 8080
+        env:                                # Add the environment variable for container
+        - name: SPRING_PROFILES_ACTIVE
+          value: dev                        # Specify the profile you want to activate
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmpdir                # Mount the writable temp directory  
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        securityContext:
+          allowPrivilegeEscalation: false  # Prevent privilege escalation
+          readOnlyRootFilesystem: false      # Make root filesystem read-only
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: rsvpbackendapp-service
+  name: rsvpbackend
+  namespace: kalyanam
 spec:
-  ports:
-    - protocol: TCP
-      port: 9091
-      targetPort: 9091
   selector:
-    app: rsvpbackendapp
- 
+    app: rsvpbackend
+  ports:
+  - protocol: TCP
+    port: 8090
+    targetPort: 8080
+  type: NodePort
