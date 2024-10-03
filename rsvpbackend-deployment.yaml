@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: rsvpbackendapp
-          image: dockerrajmanda/rsvpbackend:20
+          image: /rsvpbackend:21
           imagePullPolicy: Always
           ports:
             - containerPort: 9091
