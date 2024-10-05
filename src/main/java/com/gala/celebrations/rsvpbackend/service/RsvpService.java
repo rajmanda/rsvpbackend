@@ -51,4 +51,8 @@ public class RsvpService {
     public void deleteRsvp(int rsvpId) {
         rsvpRepo.deleteByRsvpId(rsvpId);
     }
+
+    public void deleteAllRsvps() {
+        rsvpRepo.deleteAll();
+    }
 }
