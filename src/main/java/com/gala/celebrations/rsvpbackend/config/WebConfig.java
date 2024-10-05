@@ -7,15 +7,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+////                .allowedOrigins("http://localhost:4200")
+//                .allowedOrigins("http://localhost:4200", "http://rajmanda-dev.com")
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                .allowedHeaders("*")
+//                .allowCredentials(true);
+//    }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-//                .allowedOrigins("http://localhost:4200")
-                .allowedOrigins("http://localhost:4200", "http://rajmanda-dev.com")
+                .allowedOrigins("*")  // Allow any domain
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowCredentials(false);  // Credentials are not allowed with wildcard origins
     }
-
 }
 
