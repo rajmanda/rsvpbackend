@@ -29,4 +29,10 @@ public class RsvpController {
         List<RsvpDTO> rsvps = rsvpService.getAllRsvps();
         return new ResponseEntity<>(rsvps, HttpStatus.OK);
     }
+
+    @DeleteMapping("/deleteallrsvps")
+    public ResponseEntity<Void> deleteAllRsvps() {
+        rsvpService.deleteAllRsvps();
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
