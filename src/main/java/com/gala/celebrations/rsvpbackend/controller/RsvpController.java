@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class RsvpController {
 
     @PostMapping("/saversvp")
     public ResponseEntity<RsvpDTO> saveOrder(@RequestBody RsvpDetails rsvpDetails){
+        System.out.println(rsvpDetails);
         RsvpDTO rsvpSavedInDB = rsvpService.saveRsvpInDB(rsvpDetails);
         return new ResponseEntity<>(rsvpSavedInDB, HttpStatus.CREATED);
     }
