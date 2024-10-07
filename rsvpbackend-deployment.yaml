@@ -57,3 +57,21 @@ spec:
       port: 8090
       targetPort: 8080
   type: ClusterIP      
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-frontend-kalyanam
+  namespace: kalyanam
+spec:
+  podSelector:
+    matchLabels:
+      app: rsvpbackend  # Label for your rsvpbackend pods
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: kalyanam  # Label for your frontend pods
+
