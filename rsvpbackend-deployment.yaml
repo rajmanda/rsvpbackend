@@ -53,7 +53,7 @@ spec:
   selector:
     app: rsvpbackend
   ports:
-  - protocol: TCP
-    port: 8090
-    targetPort: 8080
-  # type: NodePort
+    - protocol: TCP
+      port: 8090
+      targetPort: 8080
+  type: ClusterIP      
