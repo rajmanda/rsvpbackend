@@ -1,3 +1,11 @@
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://my-eureka-0.my-eureka-headless.default.svc.cluster.local:8761/eureka/,http://my-eureka-1.my-eureka-headless.default.svc.cluster.local:8761/eureka/,http://my-eureka-2.my-eureka-headless.default.svc.cluster.local:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
 spring:
   data:
     mongodb:
