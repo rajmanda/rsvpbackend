@@ -3,6 +3,8 @@ name: Java CI with Maven and Docker
 on:
   push:
     branches: [ "main" ]
+    tags:                 # Trigger on tag push for releases
+      - 'v*.*.*'
   pull_request:
     branches: [ "main" ]
 
