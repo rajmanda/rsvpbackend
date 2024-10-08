@@ -1,10 +1,23 @@
+#eureka:
+#  client:
+#    enabled: true
+#    service-url:
+#      defaultZone: http://my-eureka-0.my-eureka-headless.default.svc.cluster.local:8761/eureka/,http://my-eureka-1.my-eureka-headless.default.svc.cluster.local:8761/eureka/,http://my-eureka-2.my-eureka-headless.default.svc.cluster.local:8761/eureka/
+#    fetch-registry: true
+#    register-with-eureka: true
+
 eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: http://my-eureka-0.my-eureka-headless.default.svc.cluster.local:8761/eureka/,http://my-eureka-1.my-eureka-headless.default.svc.cluster.local:8761/eureka/,http://my-eureka-2.my-eureka-headless.default.svc.cluster.local:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
+      defaultZone: http://my-eureka.default.svc.cluster.local:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: rsvpbackend
+    non-secure-port: 8080
+    status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
+    health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
+
 
 spring:
   data:
