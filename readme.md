@@ -71,3 +71,8 @@ helm install nginx-ingress nginx-stable/nginx-ingress \
 --set controller.debug.enable=false
 
 # ########## Install ArgoCD Ingress Controller  Server on k8s
+kubectl get namespaces
+kubectl config set-context --namespace argocd --current
+
+Follow instructions  from here
+https://artifacthub.io/packages/helm/argo/argo-cd
