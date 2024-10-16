@@ -8,15 +8,14 @@
 
 eureka:
   client:
-    enabled: true
     service-url:
-      defaultZone: ${EUREKA_DEFAULT_ZONE:http://my-eureka-headless.eureka.svc.cluster.local:8761}
-    fetch-registry: ${EUREKA_FETCH_REGISTRY:true}
-    register-with-eureka: ${EUREKA_REGISTER_WITH_EUREKA:true}
+      defaultZone: http://my-eureka-headless.eureka.svc.cluster.local:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
   instance:
-    prefer-ip-address: ${EUREKA_PREFER_IP_ADDRESS:true}
-    hostname: ${EUREKA_INSTANCE_HOSTNAME:rsvpbackend}
-    non-secure-port: ${EUREKA_INSTANCE_NON_SECURE_PORT:8080}
+    prefer-ip-address: true
+    hostname: rsvpbackend
+    non-secure-port: 8080
     status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
     health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
 
