@@ -6,6 +6,9 @@
 #    fetch-registry: true
 #    register-with-eureka: true
 
+server:
+  port: 8443
+
 eureka:
   client:
     service-url:
@@ -15,7 +18,8 @@ eureka:
   instance:
     prefer-ip-address: true
     hostname: rsvpbackend
-    non-secure-port: 8080
+    secure-port: 8443
+    secure-port-enabled: true
     status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
     health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
 
