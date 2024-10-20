@@ -72,7 +72,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}  # Use your new secret here
 
-
       # Step 3: Checkout the tf-gcp-wif repository
       - name: Checkout tf-gcp-wif repo
         uses: actions/checkout@v3
@@ -82,7 +81,7 @@ jobs:
           path: tf-gcp-wif  # Check out the repository in a subdirectory named tf-gcp-wif
           token: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}
 
-      # Step 3: Debugging - List files to confirm presence of rsvpbackend-deployment.yaml
+      # Step 3: Debugging - List files to confirm presence of kalyanam-deployment.yaml
       - name: List files in current directory
         run: ls -al
 
@@ -94,11 +93,9 @@ jobs:
           cd tf-gcp-wif  # Change directory to tf-gcp-wif
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add deploy/rsvpbackend-deployment.yaml
+          git add deploy/kalyanam-deployment.yaml
           git remote set-url origin https://x-access-token:${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}@github.com/rajmanda/tf-gcp-wif.git
-          git commit -m "Copy updated rsvpbackend-deployment.yaml from kalyanam repo"
+          git commit -m "Copy updated kalyanam-deployment.yaml from kalyanam repo"
           git push origin HEAD:feature/deploy-kalyanam
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}  # Use your new secret here
-
-
