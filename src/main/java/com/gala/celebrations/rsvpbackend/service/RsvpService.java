@@ -19,9 +19,9 @@ public class RsvpService {
     RsvpRepo rsvpRepo;
 
     @Autowired
-    SequenceGenerator sequenceGenerator;
+    SequenceGeneratorService sequenceGeneratorService;
 
-    public RsvpDTO saveRsvpInDB(RsvpDetails rsvpDetails) {
+    public RsvpDTO saveRsvpInDB(String seqName, RsvpDetails rsvpDetails) {
         // Check for an existing record (excluding the RSVP ID)
         Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmail(rsvpDetails.getName(),rsvpDetails.getUserEmail());
         if (existingRsvp.isPresent()) {
@@ -31,7 +31,7 @@ public class RsvpService {
             rsvpRepo.deleteByRsvpId(oldRsvp.getRsvpId()); // Update the existing entry
         }
 
-        int rsvpId = sequenceGenerator.generateNextRsvpId();
+        int rsvpId = sequenceGeneratorService.getNextSequence(seqName);
         Rsvp rsvpToBeSaved =  new Rsvp(rsvpId, rsvpDetails);
         Rsvp rsvpCreated = rsvpRepo.save(rsvpToBeSaved);
         return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvpCreated);
