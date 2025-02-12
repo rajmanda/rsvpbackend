@@ -22,7 +22,7 @@ public class RsvpController {
     @PostMapping("/saversvp")
     public ResponseEntity<RsvpDTO> saveOrder(@RequestBody RsvpDetails rsvpDetails){
         System.out.println(rsvpDetails);
-        RsvpDTO rsvpSavedInDB = rsvpService.saveRsvpInDB(rsvpDetails);
+        RsvpDTO rsvpSavedInDB = rsvpService.saveRsvpInDB("rsvp", rsvpDetails);
         return new ResponseEntity<>(rsvpSavedInDB, HttpStatus.CREATED);
     }
 
