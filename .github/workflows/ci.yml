@@ -59,18 +59,33 @@ jobs:
     steps:
       # Step 1: Checkout the repository
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
 
-      # Step 2: Update the image in the deployment manifest
+      # Step 2: Configure Git
+      - name: Configure Git
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+      # Step 3: Fetch latest changes and reset
+      - name: Fetch and reset
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      # Step 4: Update the image in the deployment manifest
       - name: Update Kubernetes manifest
         run: |
-          git config pull.rebase false
-          git pull origin main
-          sed -i "s/image: .*/image: ${{ secrets.DOCKERHUB_USERNAME }}\\/rsvpbackend:${{ github.run_number }}/" rsvpbackend-deployment.yaml
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:${{ github.run_number }}|" rsvpbackend-deployment.yaml
+
+      # Step 5: Commit and push changes
+      - name: Commit and push changes
+        run: |
           git add rsvpbackend-deployment.yaml
-          git commit -m "Update Docker image to latest version"
+          git commit -m "Update Docker image to version ${{ github.run_number }}"
           git push origin main
+
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}  # Use your new secret here
 
