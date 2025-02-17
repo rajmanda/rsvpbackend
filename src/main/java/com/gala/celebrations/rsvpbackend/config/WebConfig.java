@@ -19,13 +19,22 @@ public class WebConfig implements WebMvcConfigurer {
 //                .allowCredentials(true);
 //    }
 
+//    @Override
+//    public void addCorsMappings(@NonNull CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOrigins("*")  // Allow any domain
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                .allowedHeaders("*")
+//                .allowCredentials(false);  // Credentials are not allowed with wildcard origins
+//    }
+
     @Override
-    public void addCorsMappings(@NonNull CorsRegistry registry) {
+    public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("*")  // Allow any domain
+                .allowedOrigins("http://localhost:4200", "https://rajmanda-dev.com", "https://shravanikalyanam.com")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(false);  // Credentials are not allowed with wildcard origins
+                .allowCredentials(true);
     }
 }
 
