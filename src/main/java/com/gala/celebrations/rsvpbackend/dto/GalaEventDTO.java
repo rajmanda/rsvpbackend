@@ -1,15 +1,13 @@
-package com.gala.celebrations.rsvpbackend.entity;
-
-import com.gala.celebrations.rsvpbackend.dto.GalaEventDetails;
+package com.gala.celebrations.rsvpbackend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class GalaEvent {
+@NoArgsConstructor
+public class GalaEventDTO {
     private int galaEventId;
     private GalaEventDetails galaEventDetails;
 }
