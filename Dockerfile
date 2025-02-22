@@ -14,21 +14,18 @@ COPY src ./src
 # Package the application
 RUN mvn package -DskipTests
 
-# Use the official OpenJDK 17 image to run the application
-FROM openjdk:17-jdk-slim
+# Use Eclipse Temurin for the runtime stage
+FROM eclipse-temurin:17-jdk-jammy
 
 # Set the working directory in the second stage
 WORKDIR /app
 
 # Install curl and other common tools (e.g., bash, wget)
-#RUN apt-get update && \
-#    apt-get install -y curl wget bash && \
-#    apt-get clean && \
-#    rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update -V
-RUN apt-get install -y -V curl wget bash
-RUN apt-get clean -V && rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/lib/apt/lists/* && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends curl wget bash && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the packaged JAR file from the build stage
 COPY --from=build /app/target/*.jar app.jar
