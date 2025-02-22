@@ -2,11 +2,11 @@ name: Java CI with Maven and Docker
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/**" ]
     tags:                 # Trigger on tag push for releases
       - 'v*.*.*'
-  pull_request:
-    branches: [ "main" ]
+#  pull_request:
+#    branches: [ "main" ]
 
 jobs:
   build:
@@ -53,26 +53,68 @@ jobs:
             NODE_ENV=production
           progress: plain
 
+#  update-manifest:
+#    runs-on: ubuntu-latest
+#    needs: docker  # This job depends on the docker job
+#    steps:
+#      # Step 1: Checkout the repository
+#      - uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0  # Fetch all history for all branches and tags
+#
+#      # Step 2: Configure Git
+#      - name: Configure Git
+#        run: |
+#          git config user.name github-actions
+#          git config user.email github-actions@github.com
+#
+#      # Step 3: Fetch latest changes and reset
+#      - name: Fetch and reset
+#        run: |
+#          git fetch origin main
+#          git reset --hard origin/main
+#
+#      # Step 4: Update the image in the deployment manifest
+#      - name: Update Kubernetes manifest
+#        run: |
+#          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:${{ github.run_number }}|" rsvpbackend-deployment.yaml
+#
+#      # Step 5: Commit and push changes
+#      - name: Commit and push changes
+#        run: |
+#          git add rsvpbackend-deployment.yaml
+#          git commit -m "Update Docker image to version ${{ github.run_number }}"
+#          git push origin main
+#
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}  # Use your new secret here
   update-manifest:
     runs-on: ubuntu-latest
-    needs: docker  # This job depends on the docker job
+    permissions:
+      contents: write  # Grant write permissions for the contents of the repository
+    needs: docker  # Let the docker image creation be complete before apply the kubernetes deployment in tf-gcp-wif repo
+
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout the current repository
       - uses: actions/checkout@v4
 
-      # Step 2: Update the image in the deployment manifest
       - name: Update Kubernetes manifest
         run: |
-          git pull origin main
-          sed -i "s/image: .*/image: ${{ secrets.DOCKERHUB_USERNAME }}\\/rsvpbackend:${{ github.run_number }}/" rsvpbackend-deployment.yaml
+          # Update the image in the Kubernetes manifest
+          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:${{ github.run_number }}|" rsvpbackend-deployment.yaml
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+
+          # Pull the latest changes to avoid conflicts
+          git fetch origin ${{ github.ref_name }}
+          git checkout ${{ github.ref_name }}
+          git pull origin ${{ github.ref_name }}
+
           git add rsvpbackend-deployment.yaml
-          git commit -m "Update Docker image to latest version"
-          git push origin main
+          git commit -m "Update Docker image to latest version - ${{ github.run_number }}"
+          git push origin HEAD:${{ github.ref }}  # Push to the same branch
         env:
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN }}  # Use your new secret here
-
       # Step 3: Checkout the tf-gcp-wif repository
       - name: Checkout tf-gcp-wif repo
         uses: actions/checkout@v3
