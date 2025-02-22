@@ -21,10 +21,14 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Install curl and other common tools (e.g., bash, wget)
-RUN apt-get update && \
-    apt-get install -y curl wget bash && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && \
+#    apt-get install -y curl wget bash && \
+#    apt-get clean && \
+#    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update -V
+RUN apt-get install -y -V curl wget bash
+RUN apt-get clean -V && rm -rf /var/lib/apt/lists/*
 
 # Copy the packaged JAR file from the build stage
 COPY --from=build /app/target/*.jar app.jar
