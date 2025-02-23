@@ -38,4 +38,10 @@ public class GalaEventController {
         galaEventService.deleteAllGalaEvents();
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete-gala-event/{id}")
+    public ResponseEntity<Void> deleteGalaEventById(@PathVariable int id) {
+        galaEventService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
