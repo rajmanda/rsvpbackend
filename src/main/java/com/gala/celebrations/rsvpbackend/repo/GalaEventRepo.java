@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface GalaEventRepo extends MongoRepository<GalaEvent, Integer> {
     Optional<GalaEvent> findByGalaEventDetails_Name(String name);
     // Delete operation by GalaEventId
+
+    Optional<GalaEvent> findByGalaEventId(int galaEventId);
     void deleteByGalaEventId(int GalaEventId);
 }
