@@ -41,7 +41,14 @@ public class GalaEventController {
 
     @DeleteMapping("/delete-gala-event/{id}")
     public ResponseEntity<Void> deleteGalaEventById(@PathVariable int id) {
-        galaEventService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            galaEventService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            // Log the exception (optional)
+            System.out.println("Error deleting gala event with id: " + id);
+            System.out.println("Error deleting gala event with id: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
