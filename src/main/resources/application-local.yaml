@@ -1,15 +1,15 @@
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    fetch-registry: true
-    register-with-eureka: true
-  instance:
-    prefer-ip-address: true
-    hostname: rsvpbackend
-    non-secure-port: 8080
-    status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
-    health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
+#    fetch-registry: true
+#    register-with-eureka: true
+#  instance:
+#    prefer-ip-address: true
+#    hostname: rsvpbackend
+#    non-secure-port: 8080
+#    status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
+#    health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
 
 spring:
   data:
