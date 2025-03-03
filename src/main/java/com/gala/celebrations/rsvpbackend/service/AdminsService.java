@@ -1,7 +1,7 @@
 package com.gala.celebrations.rsvpbackend.service;
 
 import com.gala.celebrations.rsvpbackend.dto.AdminsDTO;
-import com.gala.celebrations.rsvpbackend.dto.AdminsDetails;
+import com.gala.celebrations.rsvpbackend.dto.Admins;
 import com.gala.celebrations.rsvpbackend.entity.Admins;
 import com.gala.celebrations.rsvpbackend.mapper.AdminsMapper;
 import com.gala.celebrations.rsvpbackend.repo.AdminsRepo;
