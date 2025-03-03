@@ -24,6 +24,7 @@ public class RsvpDetails {
     private String rsvp ;
     private int adults ;
     private int children ;
+    private String forGuest;
 
 
 }
