@@ -32,7 +32,7 @@ public class AdminsService {
         adminsRepo.deleteByAdminsId(adminsId);
     }
 
-    public void deleteAllAdminss() {
-        adminsRepo.deleteAll();
-    }
+    // public void deleteAllAdminss() {
+    //     adminsRepo.deleteAll();
+    // }
 }
