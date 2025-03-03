@@ -9,9 +9,9 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface AdminsMapper {
 
-    RsvpMapper INSTANCE = Mappers.getMapper(AdminsMapper.class);
+    AdminsMapper INSTANCE = Mappers.getMapper(AdminsMapper.class);
 
-    Rsvp mapAdminsDTOToAdmins(AdminsDTO adminsDto);
-    RsvpDTO mapAdminsToAdminsDTO(Admins admins);
+    Admins mapAdminsDTOToAdmins(AdminsDTO adminsDto);
+    AdminsDTO mapAdminsToAdminsDTO(Admins admins);
 
 }
