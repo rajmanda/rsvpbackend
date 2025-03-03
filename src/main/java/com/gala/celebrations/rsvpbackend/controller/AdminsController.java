@@ -1,7 +1,6 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
 import com.gala.celebrations.rsvpbackend.dto.AdminsDTO;
-import com.gala.celebrations.rsvpbackend.dto.Admins;
 import com.gala.celebrations.rsvpbackend.service.AdminsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
