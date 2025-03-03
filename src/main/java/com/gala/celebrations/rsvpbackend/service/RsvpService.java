@@ -23,7 +23,8 @@ public class RsvpService {
 
     public RsvpDTO saveRsvpInDB(String seqName, RsvpDetails rsvpDetails) {
         // Check for an existing record (excluding the RSVP ID)
-        Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmail(rsvpDetails.getName(),rsvpDetails.getUserEmail());
+        //Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmail(rsvpDetails.getName(),rsvpDetails.getUserEmail());
+        Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(rsvpDetails.getName(),rsvpDetails.getUserEmail(),rsvpDetails.getForGuest());
         if (existingRsvp.isPresent()) {
             // Deactivate the existing entry
             Rsvp oldRsvp = existingRsvp.get();
