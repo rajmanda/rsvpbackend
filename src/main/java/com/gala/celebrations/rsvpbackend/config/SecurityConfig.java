@@ -22,6 +22,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/login/**").permitAll() // Allow public access 
                 .requestMatchers("/rsvp/**").permitAll() // Allow public access to /rsvp 
+                .requestMatchers("/actuator/**").permitAll() // Allow public access to /rsvp 
                 .anyRequest().authenticated() // Require authentication for all other requests
             )
             .oauth2ResourceServer(oauth2 -> oauth2
