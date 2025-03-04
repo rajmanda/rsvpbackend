@@ -20,7 +20,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login/**").permitAll() // Allow public access to certain endpoints
+                .requestMatchers("/login/**").permitAll() // Allow public access 
+                .requestMatchers("/rsvp/**").permitAll() // Allow public access to /rsvp 
                 .anyRequest().authenticated() // Require authentication for all other requests
             )
             .oauth2ResourceServer(oauth2 -> oauth2
