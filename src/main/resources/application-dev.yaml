@@ -20,9 +20,11 @@ server:
 #    health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
 
 spring:
+  profiles:
+    active: dev
   data:
     mongodb:
-      uri: mongodb+srv://amirrajAdmin:Guruji2024@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://amirrajAdmin:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       database: galadb
       passwordFilePath: /path/to/mongo-password.txt
 
