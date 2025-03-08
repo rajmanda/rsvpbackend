@@ -11,10 +11,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import org.springframework.core.env.Environment;
 
 @Configuration
 public class MongoConfig {
+
+    private final Environment environment;
 
     @Value("${spring.data.mongodb.uri}")
     private String mongoUri;
@@ -30,12 +34,20 @@ public class MongoConfig {
 
     private String mongoPassword;
 
+    public MongoConfig(Environment environment) {
+        this.environment = environment;
+    }
+
     @PostConstruct
     public void init() throws IOException {
         // If the profile is not "local", fetch the password from the file
         if (!"local".equals(activeProfile)) {
             if (mongoPasswordFilePath != null && !mongoPasswordFilePath.isEmpty()) {
-                mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
+                try {
+                    mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
+                } catch (NoSuchFileException e) {
+                    mongoPassword = environment.getProperty("spring.data.mongodb.password", "");
+                }
             }
 
             if (mongoPassword == null || mongoPassword.isEmpty()) {
