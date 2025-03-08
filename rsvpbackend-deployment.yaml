@@ -24,7 +24,7 @@ spec:
 
       initContainers:
         - name: fetch-mongodb-password
-          image: google/cloud-sdk:alpine  # Use the GCP SDK image
+          image: dockerrajmanda/rsvpbackend:113
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secrets  # Mount the secret-volume here too
@@ -41,7 +41,7 @@ spec:
 
       containers:
         - name: rsvpbackend
-          image: dockerrajmanda/rsvpbackend:110
+          image: dockerrajmanda/rsvpbackend:113
           ports:
             - containerPort: 8080
           volumeMounts:
