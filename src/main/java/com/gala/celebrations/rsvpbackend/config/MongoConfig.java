@@ -22,7 +22,7 @@ public class MongoConfig {
     @Value("${spring.data.mongodb.database}")
     private String databaseName;
 
-    @Value("${MONGODB_PASSWORD_FILE:/etc/secrets/mongodb_password}") // Default path
+    @Value("${spring.data.mongodb.passwordFilePath:}")
     private String mongoPasswordFilePath;
 
     @Value("${spring.profiles.active:}")
