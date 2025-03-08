@@ -25,6 +25,8 @@ jobs:
 
       # Step 3: Build the project using Maven
       - name: Build with Maven
+        env:
+          SPRING_PROFILES_ACTIVE: dev
         run: mvn -B package --file pom.xml
 
   docker:
