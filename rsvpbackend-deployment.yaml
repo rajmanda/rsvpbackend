@@ -24,9 +24,9 @@ spec:
 
       initContainers:
 #        - name: fetch-mongodb-password
-#          image: dockerrajmanda/rsvpbackend:8
+#          image: dockerrajmanda/rsvpbackend:10
         - name: gcloud-container
-          image: gcr.io/google.com/cloudsdktool/google-cloud-cli:stable
+          image: dockerrajmanda/rsvpbackend:10
 
           volumeMounts:
             - name: secret-volume
@@ -44,7 +44,7 @@ spec:
 
       containers:
         - name: rsvpbackend
-          image: dockerrajmanda/rsvpbackend:9
+          image: dockerrajmanda/rsvpbackend:10
           ports:
             - containerPort: 8080
           volumeMounts:
