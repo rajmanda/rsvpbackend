@@ -40,14 +40,23 @@ public class MongoConfig {
 
     @PostConstruct
     public void init() throws IOException {
-        // If the profile is not "local", fetch the password from the file
         if (!"local".equals(activeProfile)) {
-            if (mongoPasswordFilePath != null && !mongoPasswordFilePath.isEmpty()) {
-                try {
-                    mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
-                } catch (NoSuchFileException e) {
-                    mongoPassword = environment.getProperty("spring.data.mongodb.password", "");
-                }
+            try {
+                // Read the file contents
+                String fileContents = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath)));
+
+                // Print the file contents for debugging
+                System.out.println("Debug: File contents:");
+                System.out.println(fileContents);
+
+                // Trim the password and assign it
+                mongoPassword = fileContents.trim();
+
+                // Print the trimmed password for debugging
+                System.out.println("Debug: Trimmed password: " + mongoPassword);
+            } catch (NoSuchFileException e) {
+                System.out.println("Debug: File not found, using environment variable for password.");
+                mongoPassword = environment.getProperty("spring.data.mongodb.password", "");
             }
 
             if (mongoPassword == null || mongoPassword.isEmpty()) {
@@ -56,8 +65,12 @@ public class MongoConfig {
 
             // Replace the password in the URI
             mongoUri = mongoUri.replace(":<password>", ":" + mongoPassword);
+            System.out.println("Debug: MongoDB URI updated.");
+        } else {
+            System.out.println("Debug: Active profile is 'local', skipping password fetch.");
         }
     }
+
 
     @Bean
     public MongoClient mongoClient() {
