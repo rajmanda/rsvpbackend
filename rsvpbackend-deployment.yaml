@@ -24,7 +24,7 @@ spec:
 
       initContainers:
         - name: gcloud-container
-          image: dockerrajmanda/rsvpbackend:12
+          image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest
           volumeMounts:
             - name: secret-volume
               mountPath: /etc/secrets  # Mount the secret-volume here too

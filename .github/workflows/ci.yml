@@ -73,7 +73,7 @@ jobs:
           git pull --rebase origin ${{ github.ref_name }}
           
           # Update the image in the Kubernetes manifest
-          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:${{ github.run_number }}|" rsvpbackend-deployment.yaml
+          sed -i 's|image: dockerrajmanda/rsvpbackend:[^[:space:]]*|image: ${{ secrets.DOCKERHUB_USERNAME }}/rsvpbackend:${{ github.run_number }}|' rsvpbackend-deployment.yaml
 
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
