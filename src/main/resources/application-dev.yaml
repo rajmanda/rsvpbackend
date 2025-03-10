@@ -25,6 +25,6 @@ spring:
       #uri: mongodb+srv://amirrajAdmin:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       uri: mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       database: galadb
-      passwordFilePath: /path/to/mongo-password.txt
+      passwordFilePath: /etc/secrets/mongodb_password
       password: dummyPassword
 
