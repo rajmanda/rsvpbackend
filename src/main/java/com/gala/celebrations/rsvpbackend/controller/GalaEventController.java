@@ -51,4 +51,19 @@ public class GalaEventController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    // Update an existing GalaEvent
+    @PutMapping("/update-gala-event/{id}")
+    public ResponseEntity<GalaEventDTO> updateGalaEvent(
+            @PathVariable int id,
+            @RequestBody GalaEventDetails updatedDetails) {
+        try {
+            GalaEventDTO updatedGalaEvent = galaEventService.updateGalaEvent(id, updatedDetails);
+            return new ResponseEntity<>(updatedGalaEvent, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            // Log the exception (optional)
+            System.out.println("Error updating gala event with id: " + id);
+            System.out.println("Error message: " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

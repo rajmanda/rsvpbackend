@@ -54,22 +54,19 @@ public class GalaEventService {
         GalaEventRepo.deleteByGalaEventId(galaEventId);
     }
 
-//    public GalaEventDTO updateById(int galaEventId, GalaEventDetails galaEventDetails) {
-//        // Check if the GalaEvent exists
-//        GalaEvent existingGalaEvent = GalaEventRepo.findById(galaEventId)
-//                .orElseThrow(() -> new RuntimeException("GalaEvent not found with id: " + galaEventId));
-//
-//        // Update the existing GalaEvent with new details
-//        existingGalaEvent.setName(galaEventDetails.getName());
-//        existingGalaEvent.setDate(galaEventDetails.getDate());
-//        existingGalaEvent.setLocation(galaEventDetails.getLocation());
-//        existingGalaEvent.setImage(galaEventDetails.getImage());
-//        existingGalaEvent.setDescription(galaEventDetails.getDescription());
-//
-//        // Save the updated GalaEvent
-//        GalaEvent updatedGalaEvent = GalaEventRepo.save(existingGalaEvent);
-//
-//        // Convert to DTO and return
-//        return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(updatedGalaEvent);
-//    }
+    // Update an existing GalaEvent
+    public GalaEventDTO updateGalaEvent(int galaEventId, GalaEventDetails updatedDetails) {
+        // Fetch the existing event
+        GalaEvent existingGalaEvent = GalaEventRepo.findByGalaEventId(galaEventId)
+                .orElseThrow(() -> new RuntimeException("GalaEvent not found with id: " + galaEventId));
+
+        // Update the event details
+        existingGalaEvent.setGalaEventDetails(updatedDetails);
+
+        // Save the updated event
+        GalaEvent updatedGalaEvent = GalaEventRepo.save(existingGalaEvent);
+
+        // Convert and return the updated event as DTO
+        return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(updatedGalaEvent);
+    }
 }
