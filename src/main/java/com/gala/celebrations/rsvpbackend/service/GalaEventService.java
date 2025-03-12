@@ -30,7 +30,7 @@ public class GalaEventService {
 
     public List<GalaEventDTO> getAllGalaEvents() {
         List<GalaEvent> GalaEvents = GalaEventRepo.findAll();
-        return GalaEvents.stream()
+            return GalaEvents.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
