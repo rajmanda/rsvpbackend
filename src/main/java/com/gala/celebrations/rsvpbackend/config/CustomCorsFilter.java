@@ -17,15 +17,22 @@ public class CustomCorsFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+    
         String origin = httpRequest.getHeader("Origin");
-        if (origin != null && origin.matches("https://4200-.*-vpcf\\.cloudshell\\.dev")) {
+        //if (origin != null && origin.matches("https://4200-.*-vpcf\\.cloudshell\\.dev")) {  -- Not working
+        if (origin != null && origin.startsWith("https://4200-cs-")) {
             httpResponse.setHeader("Access-Control-Allow-Origin", origin);
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
             httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+    
+            // Handle preflight OPTIONS request
+            if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                return;
+            }
         }
-
+    
         chain.doFilter(request, response);
     }
 
