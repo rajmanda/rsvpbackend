@@ -23,6 +23,12 @@ public class FileUploadController {
 
     @PostMapping("/picture-upload")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty");
+        }else{
+            System.out.println("Trying to save file: " +  file.getOriginalFilename());
+        }
+
         try {
             // Get the file name
             String fileName = file.getOriginalFilename();
@@ -36,8 +42,10 @@ public class FileUploadController {
             // Upload the file to GCS
             storage.create(blobInfo, file.getBytes());
 
+            System.out.println("File uploaded successfully to GCS: " + fileName);
             return ResponseEntity.ok("File uploaded successfully to GCS: " + fileName);
         } catch (IOException e) {
+            System.out.println("Failed to upload file to GCS" + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file to GCS");
         }
     }
