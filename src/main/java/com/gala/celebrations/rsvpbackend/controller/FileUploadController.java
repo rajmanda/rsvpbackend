@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/upload")
@@ -22,31 +23,24 @@ public class FileUploadController {
     private String bucketName;
 
     @PostMapping("/picture-upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> handleFileUpload(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("File is empty");
-        }else{
-            System.out.println("Trying to save file: " +  file.getOriginalFilename());
+            return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
         }
 
         try {
-            // Get the file name
             String fileName = file.getOriginalFilename();
-
-            // Create a BlobId
             BlobId blobId = BlobId.of(bucketName, fileName);
-
-            // Create a BlobInfo
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
-
-            // Upload the file to GCS
             storage.create(blobInfo, file.getBytes());
 
-            System.out.println("File uploaded successfully to GCS: " + fileName);
-            return ResponseEntity.ok("File uploaded successfully to GCS: " + fileName);
+            return ResponseEntity.ok(Map.of(
+                    "message", "File uploaded successfully to GCS",
+                    "fileName", fileName
+            ));
         } catch (IOException e) {
-            System.out.println("Failed to upload file to GCS" + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file to GCS");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to upload file to GCS"));
         }
     }
 }
