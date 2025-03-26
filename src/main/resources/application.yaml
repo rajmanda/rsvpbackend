@@ -18,3 +18,6 @@ management:
   health:
     mongodb:
       enabled: true  # Enable MongoDB health check
+
+gcs:
+  bucket-name: shravani_kalyanam_bucket
