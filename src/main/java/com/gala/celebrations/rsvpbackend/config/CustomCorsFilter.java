@@ -34,7 +34,7 @@ public class CustomCorsFilter implements Filter {
         String origin = httpRequest.getHeader("Origin");
         System.out.println("Incoming request from origin: " + origin);
 
-        List<String> allowedOriginList = Arrays.asList(allowedOrigins.split(","));
+        List<String> allowedOriginList = Arrays.asList(this.allowedOrigins.split(","));
 
         if (origin != null) {
             boolean isAllowed = false;
