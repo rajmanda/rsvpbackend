@@ -19,7 +19,6 @@ public class CustomCorsFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String origin = httpRequest.getHeader("Origin");
-        System.out.println("Incoming request from origin: " + origin);
 
         if (origin != null && (origin.startsWith("https://4200-cs-") ||
                 origin.equals("https://rajmanda-dev.com") ||

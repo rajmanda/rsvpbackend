@@ -19,6 +19,7 @@ public class RsvpbackendMicroserviceApplication {
         FilterRegistrationBean<CustomCorsFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new CustomCorsFilter());
         registrationBean.addUrlPatterns("/*"); // Apply to all URLs
+        System.out.println("********************* Debug: Custom CORS filter registered.");
         return registrationBean;
     }
 
