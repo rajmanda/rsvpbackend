@@ -20,7 +20,7 @@ public class CustomCorsFilter implements Filter {
     
         String origin = httpRequest.getHeader("Origin");
         //if (origin != null && origin.matches("https://4200-.*-vpcf\\.cloudshell\\.dev")) {  -- Not working
-        if (origin != null && origin.startsWith("https://4200-cs-")) {
+        if (origin != null && origin.startsWith("https://4200-cs-*")) {
             httpResponse.setHeader("Access-Control-Allow-Origin", origin);
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
