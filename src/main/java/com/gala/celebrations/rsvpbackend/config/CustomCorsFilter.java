@@ -19,9 +19,13 @@ public class CustomCorsFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String origin = httpRequest.getHeader("Origin");
+        System.out.println("Incoming request from origin: " + origin);
+
         if (origin != null && (origin.startsWith("https://4200-cs-") ||
                 origin.equals("https://rajmanda-dev.com") ||
                 origin.equals("https://shravanikalyanam.com"))) {
+
+            System.out.println("Origin allowed: " + origin);
             httpResponse.setHeader("Access-Control-Allow-Origin", origin);
             httpResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             httpResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -29,6 +33,7 @@ public class CustomCorsFilter implements Filter {
 
             // Handle preflight OPTIONS request
             if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+                System.out.println("Handling preflight OPTIONS request");
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 return;
             }
