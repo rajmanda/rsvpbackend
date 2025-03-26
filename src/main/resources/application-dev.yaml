@@ -27,4 +27,6 @@ spring:
       database: galadb
       passwordFilePath: /etc/secrets/mongodb_password
       password: dummyPassword
-
+# cors:
+#   allowed:
+#     origins: "https://4200-cs-,https://rajmanda-dev.com,https://shravanikalyanam.com"
