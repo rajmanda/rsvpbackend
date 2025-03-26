@@ -21,7 +21,7 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE) // Ensure this filter runs early
 public class CustomCorsFilter implements Filter {
 
-    @Value("${cors.allowed.origins}") // Corrected line: removed );
+    @Value("${cors.allowed.origins}")
     private String allowedOrigins;
 
     @Override
