@@ -22,7 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Order(Ordered.HIGHEST_PRECEDENCE) // Ensure this filter runs early
 public class CustomCorsFilter implements Filter {
 
-    @Value("${cors.allowed.origins}")
+    @Value("${cors.allowed.origins:https://4200-cs-,https://rajmanda-dev.com,https://shravanikalyanam.com}")
     private String allowedOrigins;
 
     @Override

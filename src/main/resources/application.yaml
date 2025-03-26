@@ -6,6 +6,13 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: https://accounts.google.com
+  data:
+    mongodb:
+      #uri: mongodb+srv://amirrajAdmin:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: galadb
+      passwordFilePath: /etc/secrets/mongodb_password
+      password: dummyPassword
 
 server:
   port: 8080
