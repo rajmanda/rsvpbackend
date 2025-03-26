@@ -21,3 +21,7 @@ management:
 
 gcs:
   bucket-name: shravani_kalyanam_bucket
+
+cors:
+  allowed:
+    origins: "https://4200-cs-,https://rajmanda-dev.com,https://shravanikalyanam.com"
