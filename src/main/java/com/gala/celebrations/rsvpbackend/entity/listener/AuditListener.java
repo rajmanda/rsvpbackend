@@ -1,11 +1,10 @@
 package com.gala.celebrations.rsvpbackend.entity.listener;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
+import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
 import org.springframework.stereotype.Component;
+
+import com.gala.celebrations.rsvpbackend.entity.Auditable;
 
 import java.time.LocalDateTime;
 
