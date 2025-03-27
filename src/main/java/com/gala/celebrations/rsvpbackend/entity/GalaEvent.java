@@ -7,12 +7,13 @@ import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.gala.celebrations.rsvpbackend.entity.Auditable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "galaEvent")
-public class GalaEvent {
+public class GalaEvent extends Auditable {
     @Id
     private int galaEventId;
     private GalaEventDetails galaEventDetails;
