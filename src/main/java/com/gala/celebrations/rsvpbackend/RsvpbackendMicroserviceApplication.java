@@ -14,13 +14,13 @@ public class RsvpbackendMicroserviceApplication {
 		SpringApplication.run(RsvpbackendMicroserviceApplication.class, args);
 	}
 
-	@Bean
-    public FilterRegistrationBean<CustomCorsFilter> customCorsFilter() {
-        FilterRegistrationBean<CustomCorsFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new CustomCorsFilter());
-        registrationBean.addUrlPatterns("/*"); // Apply to all URLs
-        System.out.println("********************* Debug: Custom CORS filter registered.");
-        return registrationBean;
-    }
+	// @Bean
+    // public FilterRegistrationBean<CustomCorsFilter> customCorsFilter() {
+    //     FilterRegistrationBean<CustomCorsFilter> registrationBean = new FilterRegistrationBean<>();
+    //     registrationBean.setFilter(new CustomCorsFilter());
+    //     registrationBean.addUrlPatterns("/*"); // Apply to all URLs
+    //     System.out.println("********************* Debug: Custom CORS filter registered.");
+    //     return registrationBean;
+    // }
 
 }
