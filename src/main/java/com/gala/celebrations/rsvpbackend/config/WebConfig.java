@@ -7,32 +7,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-//        registry.addMapping("/**")
-////                .allowedOrigins("http://localhost:4200")
-//                .allowedOrigins("http://localhost:4200", "http://rajmanda-dev.com")
-//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-//                .allowedHeaders("*")
-//                .allowCredentials(true);
-//    }
-
-//    @Override
-//    public void addCorsMappings(@NonNull CorsRegistry registry) {
-//        registry.addMapping("/**")
-//                .allowedOrigins("*")  // Allow any domain
-//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-//                .allowedHeaders("*")
-//                .allowCredentials(false);  // Credentials are not allowed with wildcard origins
-//    }
-
+    // @Override
+    // public void addCorsMappings(CorsRegistry registry) {
+    //     registry.addMapping("/**")
+    //             .allowedOrigins("http://localhost:4200", "https://rajmanda-dev.com", "https://shravanikalyanam.com")
+    //             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+    //             .allowedHeaders("*")
+    //             .allowCredentials(true);
+    // }
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200", "https://rajmanda-dev.com", "https://shravanikalyanam.com")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+    registry.addMapping("/**")
+            .allowedOriginPatterns("*") // Uses patterns instead of hardcoded origins
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true);
+}
 }
 
