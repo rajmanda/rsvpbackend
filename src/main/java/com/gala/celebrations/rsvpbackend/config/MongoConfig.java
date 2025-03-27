@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import jakarta.annotation.PostConstruct;
+
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import org.springframework.core.env.Environment;
 
 @Configuration
+@EnableMongoAuditing
 public class MongoConfig {
 
     private final Environment environment;

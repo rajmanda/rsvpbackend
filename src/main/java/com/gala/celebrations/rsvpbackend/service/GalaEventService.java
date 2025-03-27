@@ -50,8 +50,11 @@ public class GalaEventService {
     public void deleteById(int galaEventId) {
         GalaEvent existingGalaEvent = GalaEventRepo.findByGalaEventId(galaEventId)
         .orElseThrow(() -> new RuntimeException("GalaEvent not found with id: " + galaEventId));
-        System.out.println(existingGalaEvent.getGalaEventDetails().getName());
-        GalaEventRepo.deleteByGalaEventId(galaEventId);
+        System.out.println("deleting - " +existingGalaEvent.getGalaEventDetails().getName());
+
+        //GalaEventRepo.deleteByGalaEventId(galaEventId);
+        existingGalaEvent.setActive(false);
+        GalaEventRepo.save(existingGalaEvent);
     }
 
     // Update an existing GalaEvent

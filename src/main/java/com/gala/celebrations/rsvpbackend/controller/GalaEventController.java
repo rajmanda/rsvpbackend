@@ -33,11 +33,11 @@ public class GalaEventController {
         return new ResponseEntity<>(galaEvents, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete-all-gala-Events")
-    public ResponseEntity<Void> deleteAllgalaEvents() {
-        galaEventService.deleteAllGalaEvents();
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+    // @DeleteMapping("/delete-all-gala-Events")
+    // public ResponseEntity<Void> deleteAllgalaEvents() {
+    //     //galaEventService.deleteAllGalaEvents();
+    //     return new ResponseEntity<>(HttpStatus.OK);
+    // }
 
     @DeleteMapping("/delete-gala-event/{id}")
     public ResponseEntity<Void> deleteGalaEventById(@PathVariable int id) {
