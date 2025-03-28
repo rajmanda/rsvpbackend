@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "galaEvent")
-public class GalaEvent {
+public class GalaEvent extends Auditable {
     @Id
     private int galaEventId;
     private GalaEventDetails galaEventDetails;

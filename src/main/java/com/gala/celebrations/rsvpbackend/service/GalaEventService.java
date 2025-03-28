@@ -28,9 +28,21 @@ public class GalaEventService {
         return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(GalaEventCreated);
     }
 
+//    public List<GalaEventDTO> getAllGalaEvents() {
+//        //List<GalaEvent> GalaEvents = GalaEventRepo.findAll();
+//        List<GalaEvent> GalaEvents = GalaEventRepo.findByActiveTrue();
+//            return GalaEvents.stream()
+//                .map(this::convertToDto)
+//                .collect(Collectors.toList());
+//    }
+
     public List<GalaEventDTO> getAllGalaEvents() {
-        List<GalaEvent> GalaEvents = GalaEventRepo.findAll();
-            return GalaEvents.stream()
+        List<GalaEvent> galaEvents = GalaEventRepo.findAll()
+                .stream()
+                .filter(event -> Boolean.TRUE.equals(event.getActive())) // Filter for active=true
+                .collect(Collectors.toList());
+
+        return galaEvents.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -52,8 +64,7 @@ public class GalaEventService {
         .orElseThrow(() -> new RuntimeException("GalaEvent not found with id: " + galaEventId));
         System.out.println("deleting - " +existingGalaEvent.getGalaEventDetails().getName());
 
-        //GalaEventRepo.deleteByGalaEventId(galaEventId);
-        //existingGalaEvent.setActive(false);
+        existingGalaEvent.setActive(false);
         GalaEventRepo.save(existingGalaEvent);
     }
 
