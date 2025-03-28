@@ -53,7 +53,7 @@ public class GalaEventService {
         System.out.println("deleting - " +existingGalaEvent.getGalaEventDetails().getName());
 
         //GalaEventRepo.deleteByGalaEventId(galaEventId);
-        existingGalaEvent.setActive(false);
+        //existingGalaEvent.setActive(false);
         GalaEventRepo.save(existingGalaEvent);
     }
 
