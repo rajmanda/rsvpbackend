@@ -25,6 +25,6 @@ public class RsvpDetails {
     private int adults ;
     private int children ;
     private String forGuest;
-
+    private String comments;
 
 }
