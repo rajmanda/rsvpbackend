@@ -41,53 +41,53 @@ public class RsvpService {
         int rsvpId = sequenceGeneratorService.getNextSequence(seqName);
         Rsvp rsvpToBeSaved =  new Rsvp(rsvpId, rsvpDetails);
         Rsvp rsvpCreated = rsvpRepo.save(rsvpToBeSaved);
-        sendRSVPConfirmationEmail(rsvpCreated.getRsvpDetails());
+        //sendRSVPConfirmationEmail(rsvpCreated.getRsvpDetails());
         return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvpCreated);
     }
 
 
-    private void sendRSVPConfirmationEmail(RsvpDetails rsvpDetails) {
-
-        EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setRecipient(rsvpDetails.getUserEmail());
-        // Consider making the subject more specific too
-        emailDetails.setSubject("RSVP Confirmation for " + rsvpDetails.getName());
-
-        // Use String.format to insert the username and other relevant details
-        String body = String.format("""
-                  Dear %s,
-                  
-                  Thank you for confirming your attendance! We’re thrilled you’ll be joining us and look forward to making it a memorable experience at: %s.
-                  
-                  Date: %s
-                  Location: %s
-                  
-                  We have recorded your response:
-                  RSVP Status: %s
-                  Adults: %d
-                  Children: %d
-                  Comments: %s
-                
-                  We look forward to celebrating with you!
-                  
-                  Best regards,
-                  Raj Manda
-                  (On behalf of Vijayram & Bhargavi Manda)
-                  https://shravanikalyanam.com/login
-                  """,
-                rsvpDetails.getUserName(),      // Argument for %s (Dear %s,)
-                rsvpDetails.getName(),          // Argument for %s (event: %s)
-                rsvpDetails.getDate(),          // Argument for %s (Date: %s)
-                rsvpDetails.getLocation(),      // Argument for %s (Location: %s)
-                rsvpDetails.getRsvp(),          // Argument for %s (RSVP Status: %s)
-                rsvpDetails.getAdults(),        // Argument for %d (Adults: %d)
-                rsvpDetails.getChildren(),      // Argument for %d (Children: %d)
-                rsvpDetails.getComments() != null ? rsvpDetails.getComments() : "None" // Handle null comments
-        );
-
-        emailDetails.setBody(body);
-        emailSender.sendSimpleMail(emailDetails);
-    }
+//    private void sendRSVPConfirmationEmail(RsvpDetails rsvpDetails) {
+//
+//        EmailDetails emailDetails = new EmailDetails();
+//        emailDetails.setRecipient(rsvpDetails.getUserEmail());
+//        // Consider making the subject more specific too
+//        emailDetails.setSubject("RSVP Confirmation for " + rsvpDetails.getName());
+//
+//        // Use String.format to insert the username and other relevant details
+//        String body = String.format("""
+//                  Dear %s,
+//
+//                  Thank you for confirming your attendance! We’re thrilled you’ll be joining us and look forward to making it a memorable experience at: %s.
+//
+//                  Date: %s
+//                  Location: %s
+//
+//                  We have recorded your response:
+//                  RSVP Status: %s
+//                  Adults: %d
+//                  Children: %d
+//                  Comments: %s
+//
+//                  We look forward to celebrating with you!
+//
+//                  Best regards,
+//                  Raj Manda
+//                  (On behalf of Vijayram & Bhargavi Manda)
+//                  https://shravanikalyanam.com/login
+//                  """,
+//                rsvpDetails.getUserName(),      // Argument for %s (Dear %s,)
+//                rsvpDetails.getName(),          // Argument for %s (event: %s)
+//                rsvpDetails.getDate(),          // Argument for %s (Date: %s)
+//                rsvpDetails.getLocation(),      // Argument for %s (Location: %s)
+//                rsvpDetails.getRsvp(),          // Argument for %s (RSVP Status: %s)
+//                rsvpDetails.getAdults(),        // Argument for %d (Adults: %d)
+//                rsvpDetails.getChildren(),      // Argument for %d (Children: %d)
+//                rsvpDetails.getComments() != null ? rsvpDetails.getComments() : "None" // Handle null comments
+//        );
+//
+//        emailDetails.setBody(body);
+//        emailSender.sendSimpleMail(emailDetails);
+//    }
 
     public List<RsvpDTO> getAllRsvps() {
         List<Rsvp> rsvps = rsvpRepo.findAll();
