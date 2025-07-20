@@ -85,8 +85,11 @@ public class ProductionGmailConfig {
         logger.info("spring.mail.host = {}", environment.getProperty("spring.mail.host"));
         logger.info("spring.mail.port = {}", environment.getProperty("spring.mail.port"));
         logger.info("spring.mail.username = {}", environment.getProperty("spring.mail.username"));
-        // This will now reflect the value read from the file because we used addFirst()
-        logger.info("spring.mail.password = [VERIFIED FROM FILE]");
+
+        // SECURITY WARNING: Temporarily logging the raw password for debugging.
+        // This should be removed or changed back to a placeholder like "[VERIFIED]" before production.
+        logger.info("spring.mail.password = {}", environment.getProperty("spring.mail.password"));
+
         logger.info("spring.mail.properties.mail.smtp.auth = {}", environment.getProperty("spring.mail.properties.mail.smtp.auth"));
         logger.info("spring.mail.properties.mail.smtp.starttls.enable = {}", environment.getProperty("spring.mail.properties.mail.smtp.starttls.enable"));
         logger.info("-------------------------------------------");
