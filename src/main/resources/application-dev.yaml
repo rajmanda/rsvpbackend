@@ -1,6 +1,3 @@
-server:
-  port: 8443
-
 # Eureka is used for service discovery, allowing services to find and communicate with each other dynamically.
 # Eureka is primarily designed for server-side service discovery
 # Removing it as we don't need it and can save us some $$$
@@ -19,3 +16,13 @@ server:
 #    status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
 #    health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
 
+server:
+  port: 8443
+
+spring:
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI}
+  mail:
+    password: ${SPRING_MAIL_PASSWORD}
+    passwordFilePath: /etc/secrets/gmail_password
