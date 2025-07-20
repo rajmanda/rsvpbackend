@@ -15,11 +15,14 @@ public class EmailSender {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailSender.class);
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+    private final String sender;
 
-    @Value("${spring.mail.username}")
-    private String sender;
+    @Autowired
+    public EmailSender(JavaMailSender javaMailSender, @Value("${spring.mail.username}") String sender) {
+        this.javaMailSender = javaMailSender;
+        this.sender = sender;
+    }
 
     public void sendSimpleMail(EmailDetails details) {
         try {

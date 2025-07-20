@@ -18,14 +18,9 @@ import java.util.stream.Collectors;
 @Service
 public class RsvpService {
 
-    @Autowired
-    RsvpRepo rsvpRepo;
-
-    @Autowired
-    SequenceGeneratorService sequenceGeneratorService;
-
-    @Autowired
-    EmailSender emailSender;
+    private final RsvpRepo rsvpRepo;
+    private final SequenceGeneratorService sequenceGeneratorService;
+    private final EmailSender emailSender;
 
     @Autowired
     public RsvpService(RsvpRepo rsvpRepo, SequenceGeneratorService sequenceGeneratorService, EmailSender emailSender) {
