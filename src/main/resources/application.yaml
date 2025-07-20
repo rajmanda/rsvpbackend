@@ -1,6 +1,11 @@
 spring:
+
   application:
     name: rsvpbackend
+
+  main:
+    allow-bean-definition-overriding: true
+
   security:
     oauth2:
       resourceserver:
@@ -13,8 +18,6 @@ spring:
       database: galadb
       passwordFilePath: /etc/secrets/mongodb_password
       password: dummyPassword
-  main:
-    allow-bean-definition-overriding: true
 
   mail:
     host: smtp.gmail.com
@@ -27,6 +30,7 @@ spring:
           auth: true
           starttls:
             enable: true
+    passwordFilePath: /etc/secrets/gmail_password
 server:
   port: 8080
 

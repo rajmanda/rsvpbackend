@@ -19,24 +19,3 @@ server:
 #    status-page-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/info
 #    health-check-url: http://${eureka.instance.hostname}:${eureka.instance.non-secure-port}/actuator/health
 
-spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: raj.manda@gmail.com
-    password: dummyPassword
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-    passwordFilePath: /etc/secrets/gmail_password
-  data:
-    mongodb:
-      #uri: mongodb+srv://amirrajAdmin:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-      uri: mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-      database: galadb
-      passwordFilePath: /etc/secrets/mongodb_password
-      password: dummyPassword
-
