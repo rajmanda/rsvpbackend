@@ -1,15 +1,12 @@
-spring:
-
-  application:
-    name: rsvpbackend
-
-  main:
-    allow-bean-definition-overriding: true
-
 logging:
   level:
     com.gala.celebrations.rsvpbackend: DEBUG
 
+spring:
+  application:
+    name: rsvpbackend
+  main:
+    allow-bean-definition-overriding: true
   security:
     oauth2:
       resourceserver:
@@ -22,7 +19,6 @@ logging:
       database: galadb
       passwordFilePath: /etc/secrets/mongodb_password
       password: dummyPassword
-
   mail:
     host: smtp.gmail.com
     port: 587
