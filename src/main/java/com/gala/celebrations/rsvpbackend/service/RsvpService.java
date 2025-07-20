@@ -27,22 +27,31 @@ public class RsvpService {
     @Autowired
     EmailSender emailSender;
 
+    @Autowired
+    public RsvpService(RsvpRepo rsvpRepo, SequenceGeneratorService sequenceGeneratorService, EmailSender emailSender) {
+        this.rsvpRepo = rsvpRepo;
+        this.sequenceGeneratorService = sequenceGeneratorService;
+        this.emailSender = emailSender;
+    }
+
     public RsvpDTO saveRsvpInDB(String seqName, RsvpDetails rsvpDetails) {
-        // Check for an existing record (excluding the RSVP ID)
-        //Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmail(rsvpDetails.getName(),rsvpDetails.getUserEmail());
-        Optional<Rsvp> existingRsvp = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(rsvpDetails.getName(),rsvpDetails.getUserEmail(),rsvpDetails.getForGuest());
-        if (existingRsvp.isPresent()) {
-            // Deactivate the existing entry
-            Rsvp oldRsvp = existingRsvp.get();
-            //oldRsvp.setActive(false); // Assuming there's an 'active' field
-            rsvpRepo.deleteByRsvpId(oldRsvp.getRsvpId()); // Update the existing entry
+        Optional<Rsvp> existingRsvpOpt = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(
+                rsvpDetails.getName(), rsvpDetails.getUserEmail(), rsvpDetails.getForGuest());
+
+        Rsvp rsvpToSave;
+        if (existingRsvpOpt.isPresent()) {
+            // Update the existing RSVP record
+            rsvpToSave = existingRsvpOpt.get();
+            rsvpToSave.setRsvpDetails(rsvpDetails); // Update the details
+        } else {
+            // Create a new RSVP record
+            int rsvpId = sequenceGeneratorService.getNextSequence(seqName);
+            rsvpToSave = new Rsvp(rsvpId, rsvpDetails);
         }
 
-        int rsvpId = sequenceGeneratorService.getNextSequence(seqName);
-        Rsvp rsvpToBeSaved =  new Rsvp(rsvpId, rsvpDetails);
-        Rsvp rsvpCreated = rsvpRepo.save(rsvpToBeSaved);
-        sendRSVPConfirmationEmail(rsvpCreated.getRsvpDetails());
-        return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvpCreated);
+        Rsvp rsvpSaved = rsvpRepo.save(rsvpToSave);
+        sendRSVPConfirmationEmail(rsvpSaved.getRsvpDetails());
+        return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvpSaved);
     }
 
 
