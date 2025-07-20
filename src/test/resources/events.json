@@ -1,0 +1,72 @@
+[
+  {
+    "galaEventId": 4,
+    "galaEventDetails": {
+      "name": "Nishchaya Tambulam",
+      "date": "Mar 30th 2025",
+      "location": "5 Loius Ct, Plainsboro, NJ",
+      "image": "/assets/pictures/tambulam.jpg",
+      "description": "description"
+    }
+  },
+  {
+    "galaEventId": 5,
+    "galaEventDetails": {
+      "name": "Break Day",
+      "date": "Aug 16th 2025",
+      "location": "5 Loius Ct, Princeton, NJ",
+      "image": "/assets/pictures/funday.jpg",
+      "description": "description"
+    }
+  },
+  {
+    "galaEventId": 6,
+    "galaEventDetails": {
+      "name": "Engagement & Sangeet",
+      "date": "Aug 15th 2025",
+      "location": "RasBerry's, 834 NJ-12, French Town, NJ",
+      "image": "/assets/pictures/sangeet.jpg",
+      "description": "description"
+    }
+  },
+  {
+    "galaEventId": 7,
+    "galaEventDetails": {
+      "name": "Kalyanotsavam",
+      "date": "Aug 17th 2025",
+      "location": "315 Churchill Ave, Somerset, NJ",
+      "image": "/assets/pictures/kalyanam.jpg",
+      "description": "description"
+    }
+  },
+  {
+    "galaEventId": 8,
+    "galaEventDetails": {
+      "name": "Satyanarana Swamy Pooja",
+      "date": "Aug 18th 2025",
+      "location": "605 Charleston Dr, Monroe, NJ",
+      "image": "/assets/pictures/satyanarayana-pooja.jpg",
+      "description": "description"
+    }
+  },
+  {
+    "galaEventId": 10,
+    "galaEventDetails": {
+      "name": "Pellikuturu",
+      "date": "Aug 14th 2025",
+      "location": "5 Loius Ct, Princeton, NJ",
+      "image": "/assets/pictures/pellikuthuru.jpg",
+      "description": "description"
+    }
+  },
+  {
+    "galaEventId": 11,
+    "galaEventDetails": {
+      "name": "Haldi & Mehendi",
+      "date": "Aug 16th 2025",
+      "location": "5 Loius Ct, Princeton, NJ",
+      "image": "/assets/pictures/mehendi.png",
+      "description": "description"
+    }
+  }
+]
