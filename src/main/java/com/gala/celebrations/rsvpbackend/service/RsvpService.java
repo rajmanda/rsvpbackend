@@ -50,8 +50,11 @@ public class RsvpService {
     }
 
 
+    private static final java.text.SimpleDateFormat DATE_FORMATTER = new java.text.SimpleDateFormat("MMMM dd, yyyy");
+
     private void sendRSVPConfirmationEmail(RsvpDetails rsvpDetails) {
 
+        String formattedDate = rsvpDetails.getDate() != null ? DATE_FORMATTER.format(rsvpDetails.getDate()) : "TBD";
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setRecipient(rsvpDetails.getUserEmail());
         // Consider making the subject more specific too
@@ -81,7 +84,7 @@ public class RsvpService {
                   """,
                 rsvpDetails.getUserName(),      // Argument for %s (Dear %s,)
                 rsvpDetails.getName(),          // Argument for %s (event: %s)
-                rsvpDetails.getDate(),          // Argument for %s (Date: %s)
+                formattedDate,                  // Argument for %s (Date: %s)
                 rsvpDetails.getLocation(),      // Argument for %s (Location: %s)
                 rsvpDetails.getRsvp(),          // Argument for %s (RSVP Status: %s)
                 rsvpDetails.getAdults(),        // Argument for %d (Adults: %d)

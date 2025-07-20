@@ -27,7 +27,6 @@ logging:
     host: smtp.gmail.com
     port: 587
     username: raj.manda@gmail.com
-    password: <password>
     properties:
       mail:
         debug: true
@@ -35,6 +34,7 @@ logging:
           auth: true
           starttls:
             enable: true
+    # This is the key for production-like profiles
     passwordFilePath: /etc/secrets/gmail_password
 server:
   port: 8080
