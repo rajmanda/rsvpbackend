@@ -14,15 +14,13 @@ spring:
           issuer-uri: https://accounts.google.com
   data:
     mongodb:
-      #uri: mongodb+srv://amirrajAdmin:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-      uri: mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-      database: galadb
-      passwordFilePath: /etc/secrets/mongodb_password
-      password: dummyPassword
+      uri: ${SPRING_DATA_MONGODB_URI}
+      database: ${MONGODB_DATABASE:galadb}
   mail:
     host: smtp.gmail.com
     port: 587
-    username: raj.manda@gmail.com
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
     properties:
       mail:
         debug: true
@@ -30,8 +28,7 @@ spring:
           auth: true
           starttls:
             enable: true
-    # This is the key for production-like profiles
-    passwordFilePath: /etc/secrets/gmail_password
+
 server:
   port: 8080
 
@@ -42,7 +39,7 @@ management:
         include: health, info, metrics, env, loggers, heapdump, threaddump, scheduledtasks, beans, caches
   health:
     mongodb:
-      enabled: true  # Enable MongoDB health check
+      enabled: true
 
 gcs:
-  bucket-name: shravani_kalyanam_bucket
+  bucket-name: ${GCS_BUCKET_NAME:shravani_kalyanam_bucket}

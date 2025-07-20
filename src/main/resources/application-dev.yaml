@@ -23,6 +23,19 @@ spring:
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
+      database: ${MONGODB_DATABASE:galadb}
+      passwordFilePath: ${MONGODB_PASSWORD_FILE:/etc/secrets/mongodb_password}
+  
   mail:
     password: ${SPRING_MAIL_PASSWORD}
-    passwordFilePath: /etc/secrets/gmail_password
+    passwordFilePath: ${MAIL_PASSWORD_FILE:/etc/secrets/gmail_password}
+
+# Actuator configuration for development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"  # In development, we can expose all endpoints
+  endpoint:
+    health:
+      show-details: always
