@@ -22,7 +22,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}
       passwordFilePath: ${MONGODB_PASSWORD_FILE:/etc/secrets/mongodb_password}
   
   mail:

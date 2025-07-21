@@ -2,6 +2,8 @@ package com.gala.celebrations.rsvpbackend.config;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,8 @@ import org.springframework.core.env.Environment;
 @Configuration
 @EnableMongoAuditing
 public class MongoConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
 
     private final Environment environment;
 
@@ -45,32 +49,19 @@ public class MongoConfig {
     public void init() throws IOException {
         if (!"local".equals(activeProfile)) {
             try {
-                // Read the file contents
-                String fileContents = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath)));
-
-                // Print the file contents for debugging
-                System.out.println("Debug: File contents:");
-                System.out.println(fileContents);
-
-                // Trim the password and assign it
-                mongoPassword = fileContents.trim();
-
-                // Print the trimmed password for debugging
-                System.out.println("Debug: Trimmed password: " + mongoPassword);
+                // Use the logger
+                logger.debug("Reading MongoDB password from file path: {}", mongoPasswordFilePath);
+                mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
+                logger.debug("MongoDB password loaded successfully from file.");
             } catch (NoSuchFileException e) {
-                System.out.println("Debug: File not found, using environment variable for password.");
-                mongoPassword = environment.getProperty("spring.data.mongodb.password", "");
+                logger.warn("MongoDB password file not found at '{}'. Falling back to environment variable.", mongoPasswordFilePath);
+                mongoPassword = environment.getProperty("MONGODB_PASSWORD", ""); // Use a more specific env var
             }
-
-            if (mongoPassword == null || mongoPassword.isEmpty()) {
-                throw new IllegalStateException("MONGODB_PASSWORD environment variable or file is required for non-local profiles.");
-            }
-
-            // Replace the password in the URI
-            mongoUri = mongoUri.replace(":<password>", ":" + mongoPassword);
-            System.out.println("Debug: MongoDB URI updated.");
+            // ...
+            mongoUri = mongoUri.replace("<password>", mongoPassword); // Note: I corrected the placeholder from :<password> to <password> to match the URI
+            logger.info("MongoDB URI has been dynamically configured.");
         } else {
-            System.out.println("Debug: Active profile is 'local', skipping password fetch.");
+            logger.debug("Active profile is 'local', skipping dynamic password fetch for MongoDB.");
         }
     }
 
