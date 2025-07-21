@@ -14,13 +14,13 @@ spring:
           issuer-uri: https://accounts.google.com
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}
       database: ${MONGODB_DATABASE:galadb}
   mail:
     host: smtp.gmail.com
     port: 587
     username: ${SPRING_MAIL_USERNAME:raj.manda@gmail.com}
-    password: ${SPRING_MAIL_PASSWORD}
+    password: ${SPRING_MAIL_PASSWORD:<password>}
     properties:
       mail:
         debug: true

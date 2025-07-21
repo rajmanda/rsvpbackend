@@ -23,7 +23,6 @@ spring:
   data:
     mongodb:
       uri: ${SPRING_DATA_MONGODB_URI}
-      database: ${MONGODB_DATABASE:galadb}
       passwordFilePath: ${MONGODB_PASSWORD_FILE:/etc/secrets/mongodb_password}
   
   mail:
