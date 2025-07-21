@@ -10,6 +10,8 @@ import com.gala.celebrations.rsvpbackend.repo.RsvpRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,17 +52,23 @@ public class RsvpService {
     }
 
 
-    private static final java.text.SimpleDateFormat DATE_FORMATTER = new java.text.SimpleDateFormat("MMMM dd, yyyy");
-
+    
+    private static final DateTimeFormatter INPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+    private static final DateTimeFormatter OUTPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
     private void sendRSVPConfirmationEmail(RsvpDetails rsvpDetails) {
+        String formattedDate;
+        if (rsvpDetails.getDate() != null) {
+            LocalDateTime dateTime = LocalDateTime.parse(rsvpDetails.getDate(), INPUT_DATE_FORMATTER);
+            formattedDate = dateTime.format(OUTPUT_DATE_FORMATTER);
+        } else {
+            formattedDate = "TBD";
+        }
 
-        String formattedDate = rsvpDetails.getDate() != null ? DATE_FORMATTER.format(rsvpDetails.getDate()) : "TBD";
         EmailDetails emailDetails = new EmailDetails();
         emailDetails.setRecipient(rsvpDetails.getUserEmail());
-        // Consider making the subject more specific too
         emailDetails.setSubject("RSVP Confirmation for " + rsvpDetails.getName());
 
-        // Use String.format to insert the username and other relevant details
         String body = String.format("""
                   Dear %s,
                   
