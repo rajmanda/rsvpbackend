@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-  com.example.rsvpbackend.config.MailPasswordFileProcessor
+  com.gala.celebrations.rsvpbackend.config.MailPasswordFileProcessor
