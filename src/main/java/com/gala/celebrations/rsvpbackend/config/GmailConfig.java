@@ -37,7 +37,7 @@ public class GmailConfig {
 
     @PostConstruct
     public void init() throws IOException {
-        if (!"local".equals(activeProfile)) {
+        if ("dev".equals(activeProfile)) {
             try {
                 // Read the file contents
                 String fileContents = new String(Files.readAllBytes(Paths.get(gmailPasswordFilePath)));
