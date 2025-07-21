@@ -29,20 +29,18 @@ spring:
           auth: true
           starttls:
             enable: true
-
 # Local development settings
-server:
-  port: 8080
-  servlet:
-    context-path: /
-
 # Development tools and debugging
-spring:
   devtools:
     restart:
       enabled: true
   jmx:
     enabled: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
 
 # Actuator configuration for local development
 management:
