@@ -14,10 +14,22 @@
 spring:
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://galaDbUser:jlPyxuhnTQ3ZWjgL@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}
+      passwordFilePath: ${MONGODB_PASSWORD_FILE:/etc/secrets/mongodb_password}
 
   mail:
-    password: ${SPRING_MAIL_PASSWORD:ylbgjduwqvqkfzsl}
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME:raj.manda@gmail.com}
+    password: ${SPRING_MAIL_PASSWORD:<password>}
+    passwordFilePath: ${MAIL_PASSWORD_FILE:/etc/secrets/gmail_password}
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 # Local development settings
 # Development tools and debugging
