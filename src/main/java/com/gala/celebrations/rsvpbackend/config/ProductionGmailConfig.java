@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-@Profile("!local & !test") // Activates when profile is NOT local AND NOT test
+@Profile("!local & !test& !dev") // Activates when profile is NOT local AND NOT test AND NOT dev - basically useless
 public class ProductionGmailConfig {
 
     // It's a best practice to use a structured logger instead of System.out
