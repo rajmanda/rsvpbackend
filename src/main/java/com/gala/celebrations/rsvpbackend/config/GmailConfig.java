@@ -8,6 +8,7 @@ import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.ResourceUtils;
+import org.springframework.context.annotation.Profile;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
