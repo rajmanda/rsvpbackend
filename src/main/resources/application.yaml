@@ -1,6 +1,6 @@
 logging:
   level:
-    com.gala.celebrations.rsvpbackend: DEBUG
+    com.gala.celebrations.rsvpbackend: INFO
 
 spring:
   application:
