@@ -35,3 +35,6 @@ rsvpbackend-deployment.yaml
 
 ### Windsurf ###
 .history
+
+##Local profile with passwords.
+/src/main/resources/application-local.yaml
