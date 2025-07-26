@@ -20,9 +20,9 @@ public class MailConfigLogger {
 
     @PostConstruct
     public void logMailCredentials() {
-        logger.warn("--- DEBUG: SMTP Credentials (REMOVE THIS IN PRODUCTION) ---");
-        logger.warn("SMTP Username: {}", username);
-        logger.warn("SMTP Password: {}", password);
-        logger.warn("----------------------------------------------------------");
+        logger.debug("--- DEBUG: SMTP Credentials (REMOVE THIS IN PRODUCTION) ---");
+        logger.debug("SMTP Username: {}", username);
+        logger.debug("SMTP Password: {}", password);
+        logger.debug("----------------------------------------------------------");
     }
 }
