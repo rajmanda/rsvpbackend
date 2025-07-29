@@ -7,8 +7,6 @@ import com.gala.celebrations.rsvpbackend.entity.Rsvp;
 import com.gala.celebrations.rsvpbackend.helper.EmailSender;
 import com.gala.celebrations.rsvpbackend.mapper.RsvpMapper;
 import com.gala.celebrations.rsvpbackend.repo.RsvpRepo;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
