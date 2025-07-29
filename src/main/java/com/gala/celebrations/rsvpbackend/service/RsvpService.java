@@ -7,6 +7,8 @@ import com.gala.celebrations.rsvpbackend.entity.Rsvp;
 import com.gala.celebrations.rsvpbackend.helper.EmailSender;
 import com.gala.celebrations.rsvpbackend.mapper.RsvpMapper;
 import com.gala.celebrations.rsvpbackend.repo.RsvpRepo;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +33,20 @@ public class RsvpService {
         this.emailSender = emailSender;
     }
 
+
     public RsvpDTO saveRsvpInDB(String seqName, RsvpDetails rsvpDetails) {
-        Optional<Rsvp> existingRsvpOpt = rsvpRepo.findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(
-                rsvpDetails.getName(), rsvpDetails.getUserEmail(), rsvpDetails.getForGuest());
+
+        String safeForGuest = rsvpDetails.getForGuest();
+        if (safeForGuest == null) safeForGuest = ""; // without this its inserting duplicates
+        safeForGuest = safeForGuest.trim();          // Remove unwanted whitespace if any
+
+
+        Optional<Rsvp> existingRsvpOpt = rsvpRepo
+                .findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(
+                        rsvpDetails.getName().trim(),
+                        rsvpDetails.getUserEmail().trim(),
+                        safeForGuest
+                );
 
         Rsvp rsvpToSave;
         if (existingRsvpOpt.isPresent()) {
