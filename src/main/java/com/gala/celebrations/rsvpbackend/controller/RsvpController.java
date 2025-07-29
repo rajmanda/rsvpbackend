@@ -40,7 +40,7 @@ public class RsvpController {
     @DeleteMapping("/{rsvpId}")
     public ResponseEntity<Void> deleteRsvpById(@PathVariable int rsvpId) {
         try {
-            rsvpService.deleteRsvp(rsvpId);
+            rsvpService.deleteRsvp(String.valueOf(rsvpId));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

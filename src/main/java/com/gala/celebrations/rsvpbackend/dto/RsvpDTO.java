@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RsvpDTO {
 
-    private Integer rsvpId;
+    private String rsvpId;
     private RsvpDetails rsvpDetails;
 
 }

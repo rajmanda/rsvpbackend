@@ -7,10 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface RsvpRepo extends MongoRepository<Rsvp, Integer> {
+// Update the ID type in the generic signature to String
+public interface RsvpRepo extends MongoRepository<Rsvp, String> {
     Optional<Rsvp> findByRsvpDetails_NameAndRsvpDetails_UserEmail(String name, String userEmail);
     Optional<Rsvp> findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(String name, String userEmail, String forGuest);
-    // Delete operation by rsvpId
-    void deleteByRsvpId(int rsvpId);
+
+    // Update the parameter type here as well
+    void deleteByRsvpId(String rsvpId);
 }
 

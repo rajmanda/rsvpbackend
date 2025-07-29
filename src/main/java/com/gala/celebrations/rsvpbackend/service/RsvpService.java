@@ -52,7 +52,7 @@ public class RsvpService {
             rsvpToSave.setRsvpDetails(rsvpDetails); // Update the details
         } else {
             // Create a new RSVP record
-            int rsvpId = sequenceGeneratorService.getNextSequence(seqName);
+            String rsvpId = String.valueOf(sequenceGeneratorService.getNextSequence(seqName));
             rsvpToSave = new Rsvp(rsvpId, rsvpDetails);
         }
 
@@ -125,7 +125,8 @@ public class RsvpService {
         return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvp);
     }
 
-    public void deleteRsvp(int rsvpId) {
+    // Update the parameter type here as well
+    public void deleteRsvp(String rsvpId) {
         rsvpRepo.deleteByRsvpId(rsvpId);
     }
 
