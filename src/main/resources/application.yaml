@@ -2,7 +2,15 @@ logging:
   level:
     com.gala.celebrations.rsvpbackend: INFO
 
+
 spring:
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      # Set the maximum size for a multi-file request (e.g., 50 Megabytes)
+      max-request-size: 1GB
+
   application:
     name: rsvpbackend
   main:
@@ -23,7 +31,7 @@ spring:
       username: ${SPRING_MAIL_USERNAME:raj.manda@gmail.com}
       properties:
         mail:
-          debug: false
+          debug: true
           smtp:
             auth: true
             starttls:
