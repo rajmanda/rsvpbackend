@@ -37,4 +37,13 @@ public class RsvpController {
         rsvpService.deleteAllRsvps();
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    @DeleteMapping("/{rsvpId}")
+    public ResponseEntity<Void> deleteRsvpById(@PathVariable int rsvpId) {
+        try {
+            rsvpService.deleteRsvp(rsvpId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
