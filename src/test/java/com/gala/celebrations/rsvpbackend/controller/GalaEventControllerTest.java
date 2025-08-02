@@ -24,7 +24,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 
-@WebFluxTest(GalaEventController.class)
+@WebFluxTest(controllers = GalaEventController.class)
+@Import(TestSecurityConfig.class)
+@ActiveProfiles("test")
 class GalaEventControllerTest {
 
     @Autowired
