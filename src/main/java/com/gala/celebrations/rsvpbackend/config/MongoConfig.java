@@ -22,6 +22,7 @@ import org.springframework.core.env.Environment;
 @Configuration
 @EnableReactiveMongoAuditing
 @EnableReactiveMongoRepositories(basePackages = "com.gala.celebrations.rsvpbackend.repo")
+@Profile("!test")
 public class MongoConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
