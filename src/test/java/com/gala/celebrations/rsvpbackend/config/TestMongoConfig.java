@@ -40,10 +40,8 @@ public class TestMongoConfig {
     @Bean
     @Primary
     public MongoConverter mongoConverter(MongoMappingContext mappingContext) {
-        logger.info("Creating mock MongoConverter for tests");
-        MappingMongoConverter converter = Mockito.mock(MappingMongoConverter.class);
-        when(converter.getMappingContext()).thenReturn(mappingContext);
-        return converter;
+        logger.info("Creating MappingMongoConverter for tests");
+        return new MappingMongoConverter(Mockito.mock(com.mongodb.reactivestreams.client.MongoDatabase.class), mappingContext);
     }
 
     @Bean
