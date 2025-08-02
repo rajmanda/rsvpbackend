@@ -1,7 +1,9 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
+import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDTO;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDetails;
+import com.gala.celebrations.rsvpbackend.repo.GalaEventRepo;
 import com.gala.celebrations.rsvpbackend.service.GalaEventService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
