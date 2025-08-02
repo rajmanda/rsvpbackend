@@ -1,37 +1,19 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
-import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
 import com.gala.celebrations.rsvpbackend.dto.AdminsDTO;
 import com.gala.celebrations.rsvpbackend.service.AdminsService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
 import java.util.List;
 
-@WebFluxTest(
-    controllers = AdminsController.class,
-    excludeAutoConfiguration = {
-        MongoAutoConfiguration.class,
-        MongoReactiveAutoConfiguration.class,
-        MongoDataAutoConfiguration.class,
-        MongoReactiveDataAutoConfiguration.class
-    }
-)
-@Import(TestSecurityConfig.class)
-@ActiveProfiles("test")
+@WebFluxTest(AdminsController.class)
 class AdminsControllerTest {
 
     @Autowired
@@ -39,9 +21,6 @@ class AdminsControllerTest {
 
     @MockBean
     private AdminsService adminsService;
-    
-    @MockBean
-    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Test
     void getAllAdmins_ShouldReturnAllAdmins() {
