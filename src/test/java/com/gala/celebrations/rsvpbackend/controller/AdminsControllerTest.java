@@ -28,6 +28,9 @@ class AdminsControllerTest {
     @MockBean
     private AdminsService adminsService;
 
+    @MockBean
+    private AdminsRepo adminsRepo;
+
     @Test
     void getAllAdmins_ShouldReturnAllAdmins() {
         // Arrange
