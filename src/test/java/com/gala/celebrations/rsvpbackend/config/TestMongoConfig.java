@@ -2,12 +2,9 @@ package com.gala.celebrations.rsvpbackend.config;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfig;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.runtime.Network;
+import de.flapdoodle.embed.mongo.transitions.Mongod;
+import de.flapdoodle.embed.mongo.transitions.RunningMongodProcess;
+import de.flapdoodle.reverse.TransitionWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -43,21 +40,16 @@ public class TestMongoConfig {
     private static final String DEFAULT_DATABASE_NAME = "testdb";
     private static final int DEFAULT_PORT = 27017;
     
-    private MongodExecutable mongodExecutable;
+    private TransitionWalker.ReachedState<RunningMongodProcess> mongodProcess;
 
     @PostConstruct
     public void startEmbeddedMongo() {
         try {
-            MongodConfig mongodConfig = MongodConfig.builder()
-                .version(Version.Main.V6_0)
-                .net(new Net("localhost", DEFAULT_PORT, Network.localhostIsIPv6()))
-                .build();
+            // Start embedded MongoDB with default configuration
+            Mongod mongod = Mongod.instance();
+            mongodProcess = mongod.start();
 
-            MongodStarter starter = MongodStarter.getDefaultInstance();
-            mongodExecutable = starter.prepare(mongodConfig);
-            mongodExecutable.start();
-
-            logger.info("Test embedded MongoDB started on port: {}", DEFAULT_PORT);
+            logger.info("Test embedded MongoDB started on default port (typically 27017)");
         } catch (Exception e) {
             logger.error("Failed to start embedded MongoDB", e);
             throw new RuntimeException("Could not start embedded MongoDB", e);
@@ -88,9 +80,9 @@ public class TestMongoConfig {
 
     @PreDestroy
     public void cleanup() {
-        if (mongodExecutable != null) {
+        if (mongodProcess != null) {
             try {
-                mongodExecutable.stop();
+                mongodProcess.close();
                 logger.info("Embedded MongoDB stopped");
             } catch (Exception e) {
                 logger.warn("Error stopping embedded MongoDB", e);
