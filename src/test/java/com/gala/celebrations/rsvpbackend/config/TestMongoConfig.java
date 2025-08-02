@@ -46,9 +46,9 @@ public class TestMongoConfig {
     @PostConstruct
     public void startEmbeddedMongo() {
         try {
-            // Start embedded MongoDB with specified version
+            // Start embedded MongoDB with ARM64 compatible version
             Mongod mongod = Mongod.instance();
-            mongodProcess = mongod.start(Version.Main.V6_0);
+            mongodProcess = mongod.start(Version.Main.V5_0);
 
             logger.info("Test embedded MongoDB started on default port (typically 27017)");
         } catch (Exception e) {
