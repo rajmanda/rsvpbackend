@@ -39,19 +39,19 @@ public class TestMongoConfig {
 
     @Bean
     @Primary
-    public MongoConverter mongoConverter() {
+    public MongoConverter mongoConverter(MongoMappingContext mappingContext) {
         logger.info("Creating mock MongoConverter for tests");
         MappingMongoConverter converter = Mockito.mock(MappingMongoConverter.class);
-        when(converter.getMappingContext()).thenReturn((org.springframework.data.mapping.context.MappingContext) mongoMappingContext());
+        when(converter.getMappingContext()).thenReturn(mappingContext);
         return converter;
     }
 
     @Bean
     @Primary
-    public ReactiveMongoTemplate reactiveMongoTemplate() {
+    public ReactiveMongoTemplate reactiveMongoTemplate(MongoClient mongoClient, MongoConverter mongoConverter) {
         logger.info("Creating mock ReactiveMongoTemplate for tests");
         ReactiveMongoTemplate template = Mockito.mock(ReactiveMongoTemplate.class);
-        when(template.getConverter()).thenReturn(mongoConverter());
+        when(template.getConverter()).thenReturn(mongoConverter);
         return template;
     }
 }
