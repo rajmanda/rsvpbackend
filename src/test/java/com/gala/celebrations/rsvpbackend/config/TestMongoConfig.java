@@ -30,6 +30,13 @@ public class TestMongoConfig {
 
     @Bean
     @Primary
+    public ReactiveMongoTemplate reactiveMongoTemplate() {
+        logger.info("Creating mock ReactiveMongoTemplate for tests");
+        return Mockito.mock(ReactiveMongoTemplate.class);
+    }
+
+    @Bean
+    @Primary
     public MongoMappingContext mongoMappingContext() {
         logger.info("Creating MongoMappingContext for tests");
         MongoMappingContext context = new MongoMappingContext();
