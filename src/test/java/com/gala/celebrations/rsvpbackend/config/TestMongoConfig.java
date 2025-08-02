@@ -4,6 +4,7 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import de.flapdoodle.embed.mongo.transitions.Mongod;
 import de.flapdoodle.embed.mongo.transitions.RunningMongodProcess;
+import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.reverse.TransitionWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +46,9 @@ public class TestMongoConfig {
     @PostConstruct
     public void startEmbeddedMongo() {
         try {
-            // Start embedded MongoDB with default configuration
+            // Start embedded MongoDB with specified version
             Mongod mongod = Mongod.instance();
-            mongodProcess = mongod.start();
+            mongodProcess = mongod.start(Version.Main.V6_0);
 
             logger.info("Test embedded MongoDB started on default port (typically 27017)");
         } catch (Exception e) {
