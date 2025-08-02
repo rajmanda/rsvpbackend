@@ -2,11 +2,12 @@ package com.gala.celebrations.rsvpbackend.config;
 
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
-import de.flapdoodle.embed.mongo.commands.MongodArguments;
+import de.flapdoodle.embed.mongo.MongodExecutable;
+import de.flapdoodle.embed.mongo.MongodStarter;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.mongo.transitions.Mongod;
-import de.flapdoodle.reverse.transitions.Start;
+import de.flapdoodle.embed.process.runtime.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -42,16 +43,19 @@ public class TestMongoConfig {
     private static final String DEFAULT_DATABASE_NAME = "testdb";
     private static final int DEFAULT_PORT = 27017;
     
-    private Mongod mongod;
+    private MongodExecutable mongodExecutable;
 
     @PostConstruct
     public void startEmbeddedMongo() {
         try {
-            // Configure embedded MongoDB
-            mongod = Mongod.instance()
-                .withNet(Start.to(Net.class).initializedWith(Net.defaults().withPort(DEFAULT_PORT)))
-                .withMongodArguments(Start.to(MongodArguments.class).initializedWith(MongodArguments.defaults()))
-                .start(Version.Main.V6_0);
+            MongodConfig mongodConfig = MongodConfig.builder()
+                .version(Version.Main.V6_0)
+                .net(new Net("localhost", DEFAULT_PORT, Network.localhostIsIPv6()))
+                .build();
+
+            MongodStarter starter = MongodStarter.getDefaultInstance();
+            mongodExecutable = starter.prepare(mongodConfig);
+            mongodExecutable.start();
 
             logger.info("Test embedded MongoDB started on port: {}", DEFAULT_PORT);
         } catch (Exception e) {
@@ -84,9 +88,9 @@ public class TestMongoConfig {
 
     @PreDestroy
     public void cleanup() {
-        if (mongod != null) {
+        if (mongodExecutable != null) {
             try {
-                mongod.stop();
+                mongodExecutable.stop();
                 logger.info("Embedded MongoDB stopped");
             } catch (Exception e) {
                 logger.warn("Error stopping embedded MongoDB", e);
