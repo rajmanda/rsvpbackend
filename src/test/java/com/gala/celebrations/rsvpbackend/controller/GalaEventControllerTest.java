@@ -1,6 +1,7 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
 import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
+import com.gala.celebrations.rsvpbackend.config.TestMongoConfig;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDTO;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDetails;
 import com.gala.celebrations.rsvpbackend.service.GalaEventService;
@@ -24,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 
 @WebFluxTest(controllers = GalaEventController.class)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestMongoConfig.class})
 @ActiveProfiles("test")
 class GalaEventControllerTest {
 
