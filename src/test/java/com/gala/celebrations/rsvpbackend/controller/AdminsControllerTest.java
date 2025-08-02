@@ -1,6 +1,7 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
 import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
+import com.gala.celebrations.rsvpbackend.config.TestMongoConfig;
 import com.gala.celebrations.rsvpbackend.dto.AdminsDTO;
 import com.gala.celebrations.rsvpbackend.service.AdminsService;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @WebFluxTest(controllers = AdminsController.class)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestMongoConfig.class})
 @ActiveProfiles("test")
 class AdminsControllerTest {
 
