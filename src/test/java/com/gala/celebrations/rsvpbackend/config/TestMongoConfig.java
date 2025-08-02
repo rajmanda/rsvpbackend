@@ -21,21 +21,21 @@ public class TestMongoConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(TestMongoConfig.class);
 
-    @Bean
+    @Bean("reactiveMongoClient")
     @Primary
     public MongoClient reactiveMongoClient() {
         logger.info("Creating mock MongoClient for tests");
         return Mockito.mock(MongoClient.class);
     }
 
-    @Bean
+    @Bean("reactiveMongoTemplate")
     @Primary
     public ReactiveMongoTemplate reactiveMongoTemplate() {
         logger.info("Creating mock ReactiveMongoTemplate for tests");
         return Mockito.mock(ReactiveMongoTemplate.class);
     }
 
-    @Bean
+    @Bean("mongoMappingContext")
     @Primary
     public MongoMappingContext mongoMappingContext() {
         logger.info("Creating MongoMappingContext for tests");
