@@ -1,9 +1,8 @@
 spring:
   data:
     mongodb:
-      # Let embedded MongoDB auto-configure the URI
-      uri: 
-      database: test
+      # Use embedded MongoDB - URI will be set by TestMongoConfig
+      database: testdb
 
   security:
     oauth2:
@@ -29,7 +28,7 @@ management:
     mail:
       enabled: false  # Disable mail health check for tests
     mongo:
-      enabled: true
+      enabled: false  # Disable mongo health check for tests
 
 logging:
   level:
