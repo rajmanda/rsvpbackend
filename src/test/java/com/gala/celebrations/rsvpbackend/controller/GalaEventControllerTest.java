@@ -35,6 +35,9 @@ class GalaEventControllerTest {
     @MockBean
     private GalaEventService galaEventService;
 
+    @MockBean
+    private GalaEventRepo galaEventRepo;
+
     @Test
     void saveGalaEvent_ShouldReturnCreated() {
         GalaEventDetails details = new GalaEventDetails();
