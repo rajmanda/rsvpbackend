@@ -1,7 +1,9 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/test
+      # Let embedded MongoDB auto-configure the URI
+      uri: 
+      database: test
 
   security:
     oauth2:
@@ -19,7 +21,15 @@ spring:
       mail.smtp.auth: false
       mail.smtp.starttls.enable: false
       mail.smtp.ssl.trust: localhost
-      mail.debug: true
+      mail.debug: false
+
+# Management and health configuration for tests
+management:
+  health:
+    mail:
+      enabled: false  # Disable mail health check for tests
+    mongo:
+      enabled: true
 
 logging:
   level:
@@ -33,14 +43,9 @@ jwt:
   secret: test-secret-which-needs-to-be-very-long-to-work-properly-with-jwt-rsa-keys
   expiration: 3600000
 
-# Test container configuration
-testcontainers:
-  enabled: true
-  reuse-containers: true
-
-# MongoDB test container configuration
-embedded:
-  mongodb:
-    enabled: true
-    version: 6.0.5
-    features: ["sync_delay"]
+# Embedded MongoDB configuration
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.5
