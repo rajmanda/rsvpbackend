@@ -1,6 +1,7 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
 import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
+import com.gala.celebrations.rsvpbackend.config.TestMongoConfig;
 import com.gala.celebrations.rsvpbackend.dto.RsvpDTO;
 import com.gala.celebrations.rsvpbackend.dto.RsvpDetails;
 import com.gala.celebrations.rsvpbackend.service.RsvpService;
@@ -27,7 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestSecurityConfig.class)
+@Import({TestSecurityConfig.class, TestMongoConfig.class})
 @ActiveProfiles("test")
 class RsvpControllerTest {
 
