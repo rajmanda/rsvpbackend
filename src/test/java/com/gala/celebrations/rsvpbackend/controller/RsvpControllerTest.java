@@ -4,6 +4,7 @@ import com.gala.celebrations.rsvpbackend.config.BaseIntegrationTest;
 import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
 import com.gala.celebrations.rsvpbackend.dto.RsvpDTO;
 import com.gala.celebrations.rsvpbackend.dto.RsvpDetails;
+import com.gala.celebrations.rsvpbackend.repo.RsvpRepo;
 import com.gala.celebrations.rsvpbackend.service.RsvpService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,9 @@ class RsvpControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private RsvpService rsvpService;
+
+    @MockBean
+    private RsvpRepo rsvpRepo;
 
     @BeforeEach
     void setUp() {
