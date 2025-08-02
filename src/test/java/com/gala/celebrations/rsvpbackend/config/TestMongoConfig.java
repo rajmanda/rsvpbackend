@@ -1,34 +1,46 @@
 package com.gala.celebrations.rsvpbackend.config;
 
+import com.mongodb.reactivestreams.client.MongoClient;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.data.mongodb.config.EnableReactiveMongoAuditing;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 @TestConfiguration
 @Profile("test")
-@Testcontainers
+@EnableReactiveMongoAuditing
+@EnableReactiveMongoRepositories(basePackages = "com.gala.celebrations.rsvpbackend.repo")
 public class TestMongoConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(TestMongoConfig.class);
 
-    @Container
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:6.0")
-            .withReuse(true);
-
-    static {
-        mongoDBContainer.start();
-        logger.info("MongoDB Testcontainer started on: {}", mongoDBContainer.getReplicaSetUrl());
+    @Bean
+    @Primary
+    public MongoClient reactiveMongoClient() {
+        logger.info("Creating mock MongoClient for tests");
+        return Mockito.mock(MongoClient.class);
     }
 
-    @DynamicPropertySource
-    static void mongoProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-        registry.add("spring.data.mongodb.database", () -> "testdb");
+    @Bean
+    @Primary
+    public ReactiveMongoTemplate reactiveMongoTemplate() {
+        logger.info("Creating mock ReactiveMongoTemplate for tests");
+        return Mockito.mock(ReactiveMongoTemplate.class);
+    }
+
+    @Bean
+    @Primary
+    public MongoMappingContext mongoMappingContext() {
+        logger.info("Creating MongoMappingContext for tests");
+        MongoMappingContext context = new MongoMappingContext();
+        context.setAutoIndexCreation(false);
+        return context;
     }
 }
