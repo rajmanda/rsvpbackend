@@ -1,22 +1,14 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
-import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDTO;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDetails;
 import com.gala.celebrations.rsvpbackend.service.GalaEventService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,17 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 
-@WebFluxTest(
-    controllers = GalaEventController.class,
-    excludeAutoConfiguration = {
-        MongoAutoConfiguration.class,
-        MongoReactiveAutoConfiguration.class,
-        MongoDataAutoConfiguration.class,
-        MongoReactiveDataAutoConfiguration.class
-    }
-)
-@Import(TestSecurityConfig.class)
-@ActiveProfiles("test")
+@WebFluxTest(GalaEventController.class)
 class GalaEventControllerTest {
 
     @Autowired
@@ -46,9 +28,6 @@ class GalaEventControllerTest {
 
     @MockBean
     private GalaEventService galaEventService;
-    
-    @MockBean
-    private ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Test
     void saveGalaEvent_ShouldReturnCreated() {
