@@ -8,10 +8,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
@@ -42,10 +39,9 @@ public class TestMongoConfig {
     @Bean
     @Primary
     public MongoConverter mongoConverter(MongoMappingContext mappingContext) {
-        logger.info("Creating MappingMongoConverter for tests");
-        MongoDatabaseFactory mockFactory = Mockito.mock(MongoDatabaseFactory.class);
-        MappingMongoConverter converter = new MappingMongoConverter(mockFactory, mappingContext);
-        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        logger.info("Creating mock MongoConverter for tests");
+        MongoConverter converter = Mockito.mock(MongoConverter.class);
+        when(converter.getMappingContext()).thenReturn(mappingContext);
         return converter;
     }
 
