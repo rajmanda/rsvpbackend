@@ -1,7 +1,7 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
+import com.gala.celebrations.rsvpbackend.config.BaseIntegrationTest;
 import com.gala.celebrations.rsvpbackend.config.TestSecurityConfig;
-import com.gala.celebrations.rsvpbackend.config.TestMongoConfig;
 import com.gala.celebrations.rsvpbackend.dto.RsvpDTO;
 import com.gala.celebrations.rsvpbackend.dto.RsvpDetails;
 import com.gala.celebrations.rsvpbackend.service.RsvpService;
@@ -9,13 +9,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,10 +25,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({TestSecurityConfig.class, TestMongoConfig.class})
-@ActiveProfiles("test")
-class RsvpControllerTest {
+@AutoConfigureWebTestClient
+@Import(TestSecurityConfig.class)
+class RsvpControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
