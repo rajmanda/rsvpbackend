@@ -8,15 +8,15 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.mongodb.config.EnableReactiveMongoAuditing;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+
+import static org.mockito.Mockito.when;
 
 @TestConfiguration
 @Profile("test")
-@EnableReactiveMongoAuditing
-@EnableReactiveMongoRepositories(basePackages = "com.gala.celebrations.rsvpbackend.repo")
 public class TestMongoConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(TestMongoConfig.class);
@@ -30,17 +30,28 @@ public class TestMongoConfig {
 
     @Bean
     @Primary
-    public ReactiveMongoTemplate reactiveMongoTemplate() {
-        logger.info("Creating mock ReactiveMongoTemplate for tests");
-        return Mockito.mock(ReactiveMongoTemplate.class);
-    }
-
-    @Bean
-    @Primary
     public MongoMappingContext mongoMappingContext() {
         logger.info("Creating MongoMappingContext for tests");
         MongoMappingContext context = new MongoMappingContext();
         context.setAutoIndexCreation(false);
         return context;
+    }
+
+    @Bean
+    @Primary
+    public MongoConverter mongoConverter() {
+        logger.info("Creating mock MongoConverter for tests");
+        MappingMongoConverter converter = Mockito.mock(MappingMongoConverter.class);
+        when(converter.getMappingContext()).thenReturn(mongoMappingContext());
+        return converter;
+    }
+
+    @Bean
+    @Primary
+    public ReactiveMongoTemplate reactiveMongoTemplate() {
+        logger.info("Creating mock ReactiveMongoTemplate for tests");
+        ReactiveMongoTemplate template = Mockito.mock(ReactiveMongoTemplate.class);
+        when(template.getConverter()).thenReturn(mongoConverter());
+        return template;
     }
 }
