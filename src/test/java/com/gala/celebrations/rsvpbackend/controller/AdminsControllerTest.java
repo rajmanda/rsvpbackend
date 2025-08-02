@@ -17,7 +17,9 @@ import reactor.core.publisher.Flux;
 import java.util.Arrays;
 import java.util.List;
 
-@WebFluxTest(AdminsController.class)
+@WebFluxTest(controllers = AdminsController.class)
+@Import(TestSecurityConfig.class)
+@ActiveProfiles("test")
 class AdminsControllerTest {
 
     @Autowired
