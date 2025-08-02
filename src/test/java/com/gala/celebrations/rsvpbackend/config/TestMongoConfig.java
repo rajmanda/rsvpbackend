@@ -5,12 +5,10 @@ import com.mongodb.reactivestreams.client.MongoClients;
 import de.flapdoodle.embed.mongo.commands.MongodArguments;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration;
 import de.flapdoodle.embed.mongo.transitions.Mongod;
 import de.flapdoodle.reverse.transitions.Start;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
@@ -25,6 +23,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
 @Configuration
@@ -35,8 +34,7 @@ import jakarta.annotation.PreDestroy;
     MongoAutoConfiguration.class,
     MongoReactiveAutoConfiguration.class,
     MongoDataAutoConfiguration.class,
-    MongoReactiveDataAutoConfiguration.class,
-    EmbeddedMongoAutoConfiguration.class
+    MongoReactiveDataAutoConfiguration.class
 })
 public class TestMongoConfig {
 
@@ -46,9 +44,8 @@ public class TestMongoConfig {
     
     private Mongod mongod;
 
-    @Bean
-    @Primary
-    public MongoClient reactiveMongoClient() {
+    @PostConstruct
+    public void startEmbeddedMongo() {
         try {
             // Configure embedded MongoDB
             mongod = Mongod.instance()
@@ -56,10 +53,7 @@ public class TestMongoConfig {
                 .withMongodArguments(Start.to(MongodArguments.class).initializedWith(MongodArguments.defaults()))
                 .start(Version.Main.V6_0);
 
-            String connectionString = "mongodb://localhost:" + DEFAULT_PORT + "/" + DEFAULT_DATABASE_NAME;
-            logger.info("Test MongoDB started on: {}", connectionString);
-            
-            return MongoClients.create(connectionString);
+            logger.info("Test embedded MongoDB started on port: {}", DEFAULT_PORT);
         } catch (Exception e) {
             logger.error("Failed to start embedded MongoDB", e);
             throw new RuntimeException("Could not start embedded MongoDB", e);
@@ -68,8 +62,16 @@ public class TestMongoConfig {
 
     @Bean
     @Primary
-    public ReactiveMongoTemplate reactiveMongoTemplate(@Autowired MongoClient mongoClient) {
-        return new ReactiveMongoTemplate(mongoClient, DEFAULT_DATABASE_NAME);
+    public MongoClient reactiveMongoClient() {
+        String connectionString = "mongodb://localhost:" + DEFAULT_PORT + "/" + DEFAULT_DATABASE_NAME;
+        logger.info("Creating MongoClient with connection string: {}", connectionString);
+        return MongoClients.create(connectionString);
+    }
+
+    @Bean
+    @Primary
+    public ReactiveMongoTemplate reactiveMongoTemplate() {
+        return new ReactiveMongoTemplate(reactiveMongoClient(), DEFAULT_DATABASE_NAME);
     }
 
     @Bean
