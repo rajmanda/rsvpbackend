@@ -1,8 +1,10 @@
 spring:
-  data:
-    mongodb:
-      # Use embedded MongoDB - URI will be set by TestMongoConfig
-      database: testdb
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration
 
   security:
     oauth2:
@@ -41,10 +43,3 @@ jwt:
   issuer: test-issuer
   secret: test-secret-which-needs-to-be-very-long-to-work-properly-with-jwt-rsa-keys
   expiration: 3600000
-
-# Embedded MongoDB configuration
-de:
-  flapdoodle:
-    mongodb:
-      embedded:
-        version: 6.0.6
