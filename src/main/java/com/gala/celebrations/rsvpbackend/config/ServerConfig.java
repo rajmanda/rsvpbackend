@@ -1,11 +1,13 @@
 package com.gala.celebrations.rsvpbackend.config;
 
-import org.apache.catalina.connector.Connector;
-import org.apache.coyote.http11.Http11NioProtocol;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class ServerConfig {
@@ -17,27 +19,18 @@ public class ServerConfig {
     }
 
     @Bean
-    public TomcatServletWebServerFactory servletContainer() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-
-        // Check if 'dev' profile is active using getActiveProfiles
-        String[] activeProfiles = environment.getActiveProfiles();
-        for (String profile : activeProfiles) {
-            if (profile.equals("dev")) {
-                tomcat.addAdditionalTomcatConnectors(createHttpConnector());
-                break;
+    public WebFilter contextPathWebFilter() {
+        String contextPath = "/";
+        return (exchange, chain) -> {
+            ServerHttpRequest request = exchange.getRequest();
+            if (request.getURI().getPath().startsWith(contextPath)) {
+                return chain.filter(exchange);
             }
-        }
-
-        return tomcat;
-    }
-
-    private Connector createHttpConnector() {
-        Connector connector = new Connector(Http11NioProtocol.class.getName());
-        connector.setScheme("http");
-        connector.setPort(8080);         // HTTP port
-        connector.setSecure(false);
-        connector.setRedirectPort(8443); // Redirect HTTP to HTTPS
-        return connector;
+            return chain.filter(
+                exchange.mutate()
+                    .request(request.mutate().path(contextPath).build())
+                    .build()
+            );
+        };
     }
 }

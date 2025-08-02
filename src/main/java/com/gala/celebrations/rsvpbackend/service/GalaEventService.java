@@ -5,82 +5,65 @@ import com.gala.celebrations.rsvpbackend.dto.GalaEventDetails;
 import com.gala.celebrations.rsvpbackend.entity.GalaEvent;
 import com.gala.celebrations.rsvpbackend.mapper.GalaEventMapper;
 import com.gala.celebrations.rsvpbackend.repo.GalaEventRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 public class GalaEventService {
 
-    @Autowired
-    GalaEventRepo GalaEventRepo;
+    private final GalaEventRepo galaEventRepo;
+    private final SequenceGeneratorService sequenceGeneratorService;
 
-    @Autowired
-    SequenceGeneratorService sequenceGeneratorService;
-
-    public GalaEventDTO saveGalaEventInDB(String seqName, GalaEventDetails GalaEventDetails) {
-
-        int GalaEventId = sequenceGeneratorService.getNextSequence(seqName);
-        GalaEvent GalaEventToBeSaved =  new GalaEvent(GalaEventId, GalaEventDetails);
-        GalaEvent GalaEventCreated = GalaEventRepo.save(GalaEventToBeSaved);
-        return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(GalaEventCreated);
+    public Mono<GalaEventDTO> saveGalaEventInDB(String seqName, GalaEventDetails galaEventDetails) {
+        return sequenceGeneratorService.getNextSequence(seqName)
+                .flatMap(galaEventId -> {
+                    GalaEvent galaEventToBeSaved = new GalaEvent(galaEventId, galaEventDetails);
+                    return galaEventRepo.save(galaEventToBeSaved)
+                            .map(GalaEventMapper.INSTANCE::mapGalaEventToGalaEventDTO);
+                });
     }
 
-//    public List<GalaEventDTO> getAllGalaEvents() {
-//        //List<GalaEvent> GalaEvents = GalaEventRepo.findAll();
-//        List<GalaEvent> GalaEvents = GalaEventRepo.findByActiveTrue();
-//            return GalaEvents.stream()
-//                .map(this::convertToDto)
-//                .collect(Collectors.toList());
-//    }
-
-    public List<GalaEventDTO> getAllGalaEvents() {
-        List<GalaEvent> galaEvents = GalaEventRepo.findAll()
-                .stream()
-                .filter(event -> Boolean.TRUE.equals(event.getActive())) // Filter for active=true
-                .collect(Collectors.toList());
-
-        return galaEvents.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+    public Flux<GalaEventDTO> getAllGalaEvents() {
+        return galaEventRepo.findByActiveTrue()
+                .map(this::convertToDto);
     }
 
-    private GalaEventDTO convertToDto(GalaEvent GalaEvent) {
-        return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(GalaEvent);
+    public Mono<GalaEventDTO> getGalaEventById(int galaEventId) {
+        return galaEventRepo.findByGalaEventId(galaEventId)
+                .map(this::convertToDto);
     }
 
-    public void deleteGalaEvent(int GalaEventId) {
-        GalaEventRepo.deleteByGalaEventId(GalaEventId);
+    public Mono<GalaEventDTO> getGalaEventByName(String name) {
+        return galaEventRepo.findByGalaEventDetails_Name(name)
+                .map(this::convertToDto);
     }
 
-    public void deleteAllGalaEvents() {
-        GalaEventRepo.deleteAll();
+    public Mono<Void> deleteGalaEvent(int galaEventId) {
+        return galaEventRepo.deleteByGalaEventId(galaEventId);
     }
 
-    public void deleteById(int galaEventId) {
-        GalaEvent existingGalaEvent = GalaEventRepo.findByGalaEventId(galaEventId)
-        .orElseThrow(() -> new RuntimeException("GalaEvent not found with id: " + galaEventId));
-        System.out.println("deleting - " +existingGalaEvent.getGalaEventDetails().getName());
-
-        existingGalaEvent.setActive(false);
-        GalaEventRepo.save(existingGalaEvent);
+    public Mono<GalaEventDTO> updateGalaEvent(int galaEventId, GalaEventDetails updatedDetails) {
+        return galaEventRepo.findByGalaEventId(galaEventId)
+                .flatMap(existingGalaEvent -> {
+                    existingGalaEvent.setGalaEventDetails(updatedDetails);
+                    return galaEventRepo.save(existingGalaEvent)
+                            .map(GalaEventMapper.INSTANCE::mapGalaEventToGalaEventDTO);
+                });
     }
 
-    // Update an existing GalaEvent
-    public GalaEventDTO updateGalaEvent(int galaEventId, GalaEventDetails updatedDetails) {
-        // Fetch the existing event
-        GalaEvent existingGalaEvent = GalaEventRepo.findByGalaEventId(galaEventId)
-                .orElseThrow(() -> new RuntimeException("GalaEvent not found with id: " + galaEventId));
+    public Mono<Void> deleteById(int galaEventId) {
+        return galaEventRepo.findByGalaEventId(galaEventId)
+                .flatMap(existingGalaEvent -> {
+                    existingGalaEvent.setActive(false);
+                    return galaEventRepo.save(existingGalaEvent)
+                            .then();
+                });
+    }
 
-        // Update the event details
-        existingGalaEvent.setGalaEventDetails(updatedDetails);
-
-        // Save the updated event
-        GalaEvent updatedGalaEvent = GalaEventRepo.save(existingGalaEvent);
-
-        // Convert and return the updated event as DTO
-        return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(updatedGalaEvent);
+    private GalaEventDTO convertToDto(GalaEvent galaEvent) {
+        return GalaEventMapper.INSTANCE.mapGalaEventToGalaEventDTO(galaEvent);
     }
 }

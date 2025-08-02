@@ -1,18 +1,18 @@
 package com.gala.celebrations.rsvpbackend.config;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.config.EnableReactiveMongoAuditing;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+
 import jakarta.annotation.PostConstruct;
-
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -20,7 +20,8 @@ import java.nio.file.Paths;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@EnableMongoAuditing
+@EnableReactiveMongoAuditing
+@EnableReactiveMongoRepositories(basePackages = "com.gala.celebrations.rsvpbackend.repo")
 public class MongoConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(MongoConfig.class);
@@ -49,30 +50,33 @@ public class MongoConfig {
     public void init() throws IOException {
         if (!"local".equals(activeProfile)) {
             try {
-                // Use the logger
-                logger.debug("Reading MongoDB password from file path: {}", mongoPasswordFilePath);
-                mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
-                logger.debug("MongoDB password loaded successfully from file.");
+                mongoPassword = Files.readString(Paths.get(mongoPasswordFilePath)).trim();
+                mongoUri = mongoUri.replace("${MONGO_PASSWORD}", mongoPassword);
+                logger.info("MongoDB URI configured with password from file");
             } catch (NoSuchFileException e) {
-                logger.warn("MongoDB password file not found at '{}'. Falling back to environment variable.", mongoPasswordFilePath);
-                mongoPassword = environment.getProperty("MONGODB_PASSWORD", ""); // Use a more specific env var
+                logger.warn("MongoDB password file not found at {}", mongoPasswordFilePath);
+                logger.info("Using default MongoDB URI configuration");
             }
-            // ...
-            mongoUri = mongoUri.replace("<password>", mongoPassword); // Note: I corrected the placeholder from :<password> to <password> to match the URI
-            logger.info("MongoDB URI has been dynamically configured.");
         } else {
-            logger.debug("Active profile is 'local', skipping dynamic password fetch for MongoDB.");
+            logger.info("Using local MongoDB configuration");
         }
     }
 
-
     @Bean
-    public MongoClient mongoClient() {
+    public MongoClient reactiveMongoClient() {
+        logger.info("Connecting to MongoDB with URI: {}", maskSensitiveInfo(mongoUri));
         return MongoClients.create(mongoUri);
     }
 
     @Bean
-    public MongoTemplate mongoTemplate(MongoClient mongoClient) {
-        return new MongoTemplate(mongoClient, databaseName);
+    public ReactiveMongoTemplate reactiveMongoTemplate() {
+        return new ReactiveMongoTemplate(reactiveMongoClient(), databaseName);
+    }
+
+    private String maskSensitiveInfo(String connectionString) {
+        if (connectionString == null) {
+            return "";
+        }
+        return connectionString.replaceAll("(?<=:)[^@]*(?=@)", "****");
     }
 }

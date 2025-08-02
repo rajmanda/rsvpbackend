@@ -9,16 +9,17 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
 @EnableWebFluxSecurity
-@Profile("local") // Only active when the 'local' profile is active
-public class SecurityConfigLocal {
+@Profile("test")
+public class TestSecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain localWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
-                // Authorize all requests for local development
-                .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
-                // Disable CSRF protection for local development
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .build();
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/**").permitAll()
+                .anyExchange().permitAll()
+            )
+            .build();
     }
 }

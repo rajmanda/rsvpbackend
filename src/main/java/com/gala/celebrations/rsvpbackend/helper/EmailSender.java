@@ -1,45 +1,46 @@
 package com.gala.celebrations.rsvpbackend.helper;
 
-
 import com.gala.celebrations.rsvpbackend.dto.EmailDetails;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class EmailSender {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmailSender.class);
+    private final JavaMailSender mailSender;
+    
+    @Value("${spring.mail.username}")
+    private String sender;
 
-    private final JavaMailSender javaMailSender;
-    private final String sender;
-
-    @Autowired
-    public EmailSender(JavaMailSender javaMailSender, @Value("${spring.mail.username}") String sender) {
-        this.javaMailSender = javaMailSender;
-        this.sender = sender;
-    }
-
-    public void sendSimpleMail(EmailDetails details) {
-        try {
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setFrom(sender);
-            mailMessage.setTo(details.getRecipient());
-            String[] ccEmails = {"msvram@yahoo.com", "msvram@gmail.com"};
-            mailMessage.setCc(ccEmails);
-            mailMessage.setText(details.getBody());
-            mailMessage.setSubject(details.getSubject());
-
-            javaMailSender.send(mailMessage);
-            logger.info("Email sent successfully to: {}", details.getRecipient());
-        } catch (Exception e) {
-            // Log the full exception to get details on why it failed
-            logger.error("Error while sending mail to {}:", details.getRecipient(), e);
-        }
+    public Mono<Void> sendSimpleMail(EmailDetails details) {
+        return Mono.fromRunnable(() -> {
+            try {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom(sender);
+                message.setTo(details.getRecipient());
+                message.setSubject(details.getSubject());
+                message.setText(details.getBody());
+                
+                // Add CC recipients
+                String[] ccEmails = {"msvram@yahoo.com", "msvram@gmail.com"};
+                message.setCc(ccEmails);
+                
+                mailSender.send(message);
+                log.info("Email sent successfully to: {}", details.getRecipient());
+            } catch (Exception e) {
+                log.error("Failed to send email to {}: {}", details.getRecipient(), e.getMessage(), e);
+                throw new RuntimeException("Failed to send email", e);
+            }
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .then();
     }
 }

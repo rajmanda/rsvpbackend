@@ -1,0 +1,46 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/test
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://your-issuer-uri.com
+          jwk-set-uri: https://your-issuer-uri.com/.well-known/jwks.json
+
+  mail:
+    host: localhost
+    port: 1025
+    username: test@example.com
+    password: test
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+      mail.smtp.ssl.trust: localhost
+      mail.debug: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.gala.celebrations: DEBUG
+
+# Disable security for tests
+jwt:
+  issuer: test-issuer
+  secret: test-secret-which-needs-to-be-very-long-to-work-properly-with-jwt-rsa-keys
+  expiration: 3600000
+
+# Test container configuration
+testcontainers:
+  enabled: true
+  reuse-containers: true
+
+# MongoDB test container configuration
+embedded:
+  mongodb:
+    enabled: true
+    version: 6.0.5
+    features: ["sync_delay"]

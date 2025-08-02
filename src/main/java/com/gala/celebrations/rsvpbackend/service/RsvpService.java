@@ -7,130 +7,88 @@ import com.gala.celebrations.rsvpbackend.entity.Rsvp;
 import com.gala.celebrations.rsvpbackend.helper.EmailSender;
 import com.gala.celebrations.rsvpbackend.mapper.RsvpMapper;
 import com.gala.celebrations.rsvpbackend.repo.RsvpRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class RsvpService {
 
     private final RsvpRepo rsvpRepo;
     private final SequenceGeneratorService sequenceGeneratorService;
     private final EmailSender emailSender;
+    private final TemplateEngine templateEngine;
 
-    @Autowired
-    public RsvpService(RsvpRepo rsvpRepo, SequenceGeneratorService sequenceGeneratorService, EmailSender emailSender) {
-        this.rsvpRepo = rsvpRepo;
-        this.sequenceGeneratorService = sequenceGeneratorService;
-        this.emailSender = emailSender;
-    }
-
-
-    public RsvpDTO saveRsvpInDB(String seqName, RsvpDetails rsvpDetails) {
-
-        String safeForGuest = rsvpDetails.getForGuest();
-        if (safeForGuest == null) safeForGuest = ""; // without this its inserting duplicates
-        safeForGuest = safeForGuest.trim();          // Remove unwanted whitespace if any
-
-
-        Optional<Rsvp> existingRsvpOpt = rsvpRepo
-                .findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(
-                        rsvpDetails.getName().trim(),
-                        rsvpDetails.getUserEmail().trim(),
-                        safeForGuest
-                );
-
-        Rsvp rsvpToSave;
-        if (existingRsvpOpt.isPresent()) {
-            // Update the existing RSVP record
-            rsvpToSave = existingRsvpOpt.get();
-            rsvpToSave.setRsvpDetails(rsvpDetails); // Update the details
-        } else {
-            // Create a new RSVP record
-            String rsvpId = String.valueOf(sequenceGeneratorService.getNextSequence(seqName));
-            rsvpToSave = new Rsvp(rsvpId, rsvpDetails);
-        }
-
-        Rsvp rsvpSaved = rsvpRepo.save(rsvpToSave);
-        sendRSVPConfirmationEmail(rsvpSaved.getRsvpDetails());
-        return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvpSaved);
-    }
-
-
-    
-    private static final DateTimeFormatter INPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-    private static final DateTimeFormatter OUTPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    
-    private void sendRSVPConfirmationEmail(RsvpDetails rsvpDetails) {
-        String formattedDate;
-        if (rsvpDetails.getDate() != null) {
-            LocalDateTime dateTime = LocalDateTime.parse(rsvpDetails.getDate(), INPUT_DATE_FORMATTER);
-            formattedDate = dateTime.format(OUTPUT_DATE_FORMATTER);
-        } else {
-            formattedDate = "TBD";
-        }
-
-        EmailDetails emailDetails = new EmailDetails();
-        emailDetails.setRecipient(rsvpDetails.getUserEmail());
-        emailDetails.setSubject("RSVP Confirmation for " + rsvpDetails.getName());
-
-        String body = String.format("""
-                  Dear %s,
-                  
-                  Thank you for confirming your attendance! We’re thrilled you’ll be joining us and look forward to making it a memorable experience at: %s.
-                  
-                  Date: %s
-                  Location: %s
-                  
-                  We have recorded your response:
-                  RSVP Status: %s
-                  Adults: %d
-                  Children: %d
-                  Comments: %s
+    public Mono<RsvpDTO> saveRsvpInDB(String seqName, RsvpDetails rsvpDetails) {
+        return sequenceGeneratorService.getNextSequence(seqName)
+            .flatMap(sequence -> {
+                Rsvp newRsvp = new Rsvp();
+                newRsvp.setRsvpId("RSVP" + sequence);
+                newRsvp.setRsvpDetails(rsvpDetails);
+                newRsvp.setCreatedAt(LocalDateTime.now());
+                newRsvp.setLastUpdated(LocalDateTime.now());
                 
-                  We look forward to celebrating with you!
-                  
-                  Best regards,
-                  Raj Manda
-                  (On behalf of Vijayram & Bhargavi Manda)
-                  https://shravanikalyanam.com/login
-                  """,
-                rsvpDetails.getUserName(),      // Argument for %s (Dear %s,)
-                rsvpDetails.getName(),          // Argument for %s (event: %s)
-                formattedDate,                  // Argument for %s (Date: %s)
-                rsvpDetails.getLocation(),      // Argument for %s (Location: %s)
-                rsvpDetails.getRsvp(),          // Argument for %s (RSVP Status: %s)
-                rsvpDetails.getAdults(),        // Argument for %d (Adults: %d)
-                rsvpDetails.getChildren(),      // Argument for %d (Children: %d)
-                rsvpDetails.getComments() != null ? rsvpDetails.getComments() : "None" // Handle null comments
-        );
-
-        emailDetails.setBody(body);
-        emailSender.sendSimpleMail(emailDetails);
+                return rsvpRepo.save(newRsvp)
+                    .flatMap(savedRsvp -> {
+                        // Send email asynchronously
+                        return sendRsvpEmail(savedRsvp.getRsvpDetails(), "rsvp-email-template")
+                            .thenReturn(RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(savedRsvp));
+                    });
+            });
     }
 
-    public List<RsvpDTO> getAllRsvps() {
-        List<Rsvp> rsvps = rsvpRepo.findAll();
-        return rsvps.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+    public Mono<RsvpDTO> updateRsvp(Rsvp rsvp) {
+        return rsvpRepo.findById(rsvp.getRsvpId())
+            .flatMap(existingRsvp -> {
+                existingRsvp.setRsvpDetails(rsvp.getRsvpDetails());
+                existingRsvp.setLastUpdated(LocalDateTime.now());
+                return rsvpRepo.save(existingRsvp)
+                    .map(RsvpMapper.INSTANCE::mapRsvpToRsvpDTO);
+            });
     }
 
-    private RsvpDTO convertToDto(Rsvp rsvp) {
-        return RsvpMapper.INSTANCE.mapRsvpToRsvpDTO(rsvp);
+    public Flux<RsvpDTO> getAllRsvps() {
+        return rsvpRepo.findAll()
+                .doOnNext(rsvp -> log.debug("Found RSVP: {}", rsvp.getRsvpId()))
+                .map(RsvpMapper.INSTANCE::mapRsvpToRsvpDTO);
     }
 
-    // Update the parameter type here as well
-    public void deleteRsvp(String rsvpId) {
-        rsvpRepo.deleteByRsvpId(rsvpId);
+    public Mono<RsvpDTO> getRsvpById(String rsvpId) {
+        return rsvpRepo.findById(rsvpId)
+                .map(RsvpMapper.INSTANCE::mapRsvpToRsvpDTO);
     }
 
-    public void deleteAllRsvps() {
-        rsvpRepo.deleteAll();
+    public Mono<Void> deleteRsvp(String rsvpId) {
+        return rsvpRepo.deleteById(rsvpId);
+    }
+
+    private Mono<Void> sendRsvpEmail(RsvpDetails rsvpDetails, String templateName) {
+        try {
+            Context context = new Context();
+            context.setVariable("rsvp", rsvpDetails);
+            
+            String emailContent = templateEngine.process(templateName, context);
+            String subject = "RSVP " + ("true".equals(rsvpDetails.getRsvp()) ? "Confirmation" : "Regrets") + " - " + rsvpDetails.getName();
+            
+            EmailDetails emailDetails = new EmailDetails();
+            emailDetails.setRecipient(rsvpDetails.getUserEmail());
+            emailDetails.setSubject(subject);
+            emailDetails.setBody(emailContent);
+            emailDetails.setAttachment(null);
+            
+            return emailSender.sendSimpleMail(emailDetails)
+                    .doOnError(e -> log.error("Error sending email: {}", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error in sendRsvpEmail: {}", e.getMessage(), e);
+            return Mono.empty();
+        }
     }
 }

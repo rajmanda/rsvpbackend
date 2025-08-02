@@ -4,35 +4,32 @@ import com.gala.celebrations.rsvpbackend.dto.AdminsDTO;
 import com.gala.celebrations.rsvpbackend.entity.Admins;
 import com.gala.celebrations.rsvpbackend.mapper.AdminsMapper;
 import com.gala.celebrations.rsvpbackend.repo.AdminsRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
+@RequiredArgsConstructor
 public class AdminsService {
 
-    @Autowired
-    AdminsRepo adminsRepo;
+    private final AdminsRepo adminsRepo;
 
-    public List<AdminsDTO> getAllAdminss() {
-        List<Admins> admins = adminsRepo.findAll();
-        return admins.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+    public Flux<AdminsDTO> getAllAdmins() {
+        return adminsRepo.findAll()
+                .map(this::convertToDto);
     }
 
     private AdminsDTO convertToDto(Admins admins) {
         return AdminsMapper.INSTANCE.mapAdminsToAdminsDTO(admins);
     }
 
-    public void deleteAdmins(int adminsId) {
-        adminsRepo.deleteById(adminsId);
+    public Mono<Void> deleteAdmins(int adminsId) {
+        return adminsRepo.deleteById(adminsId);
     }
-
-    // public void deleteAllAdminss() {
-    //     adminsRepo.deleteAll();
-    // }
+    
+    public Mono<AdminsDTO> findByEmail(String email) {
+        return adminsRepo.findByEmail(email)
+                .map(this::convertToDto);
+    }
 }

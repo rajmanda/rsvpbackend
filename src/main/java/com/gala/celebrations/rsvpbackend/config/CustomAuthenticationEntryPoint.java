@@ -1,45 +1,60 @@
 package com.gala.celebrations.rsvpbackend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.io.IOException;
-
+@Slf4j
 @Component
-public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class CustomAuthenticationEntryPoint implements ServerAuthenticationEntryPoint {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException)
-            throws IOException, ServletException {
-
-        // Extract the Authorization header
-        String authHeader = request.getHeader("Authorization");
-
-        // Check if the Authorization header is present and starts with "Bearer "
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            // Extract the token
-            String token = authHeader.substring(7);
-            // Print the token for debugging purposes
-            System.out.println("Received JWT token: " + token);
-        } else {
-            System.out.println("No JWT token found in the Authorization header.");
-        }
-
-        // Set the response status to 401 Unauthorized
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-
-        // Write a custom error message to the response
-        System.out.println("error: Invalid or missing JWT token.");
-        response.getWriter().write("{\"error\": \"Invalid or missing JWT token.\"}");
+    public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException ex) {
+        return Mono.fromRunnable(() -> {
+            ServerHttpResponse response = exchange.getResponse();
+            response.setStatusCode(HttpStatus.UNAUTHORIZED);
+            response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            
+            // Log the authentication error
+            log.warn("Authentication error: {}", ex.getMessage());
+            
+            // Extract and log the Authorization header if present
+            String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                log.debug("Received JWT token (first 10 chars): {}...", 
+                    token.length() > 10 ? token.substring(0, 10) : token);
+            } else {
+                log.debug("No JWT token found in the Authorization header");
+            }
+            
+            // Create error response
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("error", "Invalid or missing JWT token");
+            responseBody.put("message", ex.getMessage());
+            
+            try {
+                byte[] bytes = objectMapper.writeValueAsBytes(responseBody);
+                DataBuffer buffer = response.bufferFactory().wrap(bytes);
+                response.writeWith(Mono.just(buffer)).subscribe();
+            } catch (Exception e) {
+                log.error("Error writing error response", e);
+                response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        });
     }
 }
-
-

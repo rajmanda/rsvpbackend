@@ -1,18 +1,13 @@
 package com.gala.celebrations.rsvpbackend.repo;
 
 import com.gala.celebrations.rsvpbackend.entity.Rsvp;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 @Repository
-// Update the ID type in the generic signature to String
-public interface RsvpRepo extends MongoRepository<Rsvp, String> {
-    Optional<Rsvp> findByRsvpDetails_NameAndRsvpDetails_UserEmail(String name, String userEmail);
-    Optional<Rsvp> findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(String name, String userEmail, String forGuest);
-
-    // Update the parameter type here as well
-    void deleteByRsvpId(String rsvpId);
+public interface RsvpRepo extends ReactiveMongoRepository<Rsvp, String> {
+    Mono<Rsvp> findByRsvpDetails_NameAndRsvpDetails_UserEmail(String name, String userEmail);
+    Mono<Rsvp> findByRsvpDetails_NameAndRsvpDetails_UserEmailAndRsvpDetails_ForGuest(String name, String userEmail, String forGuest);
+    Mono<Void> deleteByRsvpId(String rsvpId);
 }
-
