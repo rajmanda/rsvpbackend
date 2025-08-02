@@ -42,7 +42,7 @@ public class TestMongoConfig {
     public MongoConverter mongoConverter() {
         logger.info("Creating mock MongoConverter for tests");
         MappingMongoConverter converter = Mockito.mock(MappingMongoConverter.class);
-        when(converter.getMappingContext()).thenReturn(mongoMappingContext());
+        when(converter.getMappingContext()).thenReturn((org.springframework.data.mapping.context.MappingContext) mongoMappingContext());
         return converter;
     }
 
