@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
@@ -41,7 +42,9 @@ public class TestMongoConfig {
     @Primary
     public MongoConverter mongoConverter(MongoMappingContext mappingContext) {
         logger.info("Creating MappingMongoConverter for tests");
-        return new MappingMongoConverter(Mockito.mock(com.mongodb.reactivestreams.client.MongoDatabase.class), mappingContext);
+        MappingMongoConverter converter = new MappingMongoConverter(Mockito.mock(com.mongodb.reactivestreams.client.MongoDatabase.class), mappingContext);
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return converter;
     }
 
     @Bean
