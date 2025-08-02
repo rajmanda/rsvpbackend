@@ -1,23 +1,17 @@
 package com.gala.celebrations.rsvpbackend.config;
 
-import com.mongodb.ConnectionString;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.SimpleReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.NoOpDbRefResolver;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
-@Configuration
+@TestConfiguration
+@Profile("test")
 public class TestMongoConfig {
-
-    @Bean
-    public ReactiveMongoDatabaseFactory mongoDatabaseFactory() {
-        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017/test");
-        return new SimpleReactiveMongoDatabaseFactory(connectionString);
-    }
 
     @Bean
     public MongoMappingContext mongoMappingContext() {
@@ -32,10 +26,5 @@ public class TestMongoConfig {
         );
         converter.afterPropertiesSet();
         return converter;
-    }
-
-    @Bean
-    public ReactiveMongoTemplate reactiveMongoTemplate() {
-        return new ReactiveMongoTemplate(mongoDatabaseFactory(), mappingMongoConverter());
     }
 }
