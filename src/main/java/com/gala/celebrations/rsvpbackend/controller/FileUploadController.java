@@ -137,6 +137,46 @@ public class FileUploadController {
     }
 
     /**
+     * Generate a signed download URL for a specific blob path.
+     * This endpoint is used by the frontend to get viewable URLs for uploaded images.
+     */
+    @PostMapping("/generate-download-url")
+    public ResponseEntity<Map<String, String>> generateDownloadUrl(@RequestBody Map<String, String> request) {
+        try {
+            String blobPath = request.get("blobPath");
+
+            if (blobPath == null || blobPath.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "blobPath is required"));
+            }
+
+            // Validate that the blob exists (optional but recommended)
+            BlobId blobId = BlobId.of(bucketName, blobPath);
+            Blob blob = storage.get(blobId);
+            
+            if (blob == null || !blob.exists()) {
+                logger.warn("Requested blob does not exist: {}", blobPath);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "File not found: " + blobPath));
+            }
+
+            // Generate signed URL for viewing/downloading (valid for 1 hour)
+            String signedUrl = gcsSignedUrlService.generateSignedReadUrl(blobPath);
+
+            logger.info("Generated signed download URL for blob: {}", blobPath);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("signedUrl", signedUrl);
+            response.put("blobPath", blobPath);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Failed to generate signed download URL", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to generate signed download URL: " + e.getMessage()));
+        }
+    }
+
+    /**
      * List images from GCS with signed URLs for secure access.
      * Returns time-limited signed URLs instead of public URLs.
      */
