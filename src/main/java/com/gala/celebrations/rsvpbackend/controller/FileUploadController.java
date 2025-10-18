@@ -31,86 +31,108 @@ public class FileUploadController {
     @Value("${gcs.bucket-name}")
     private String bucketName;
 
-    @PostMapping("/picture-upload")
-    public ResponseEntity<Map<String, String>> handleFileUpload(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("event") String event) {
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
-        }
+    /**
+     * Generate a signed URL for single file upload.
+     * Frontend will use this URL to upload directly to GCS.
+     */
+    @PostMapping("/generate-upload-url")
+    public ResponseEntity<Map<String, String>> generateUploadUrl(@RequestBody Map<String, String> request) {
         try {
-            String username = getUsernameFromAuth();
-            Map<String, String> uploadResult = uploadSingleFile(file, event, username);
-            return ResponseEntity.ok(uploadResult);
-        } catch (IOException e) {
-            logger.error("Failed to upload file to GCS", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to upload file to GCS"));
-        }
-    }
+            String fileName = request.get("fileName");
+            String contentType = request.get("contentType");
+            String event = request.get("event");
 
-    @PostMapping("/multi-picture-upload")
-    public ResponseEntity<Map<String, Object>> handleMultipleFileUpload(
-            @RequestParam("files") MultipartFile[] files,
-            @RequestParam("event") String event) {
-        if (files == null || files.length == 0) {
-            return ResponseEntity.badRequest().body(Map.of("error", "No files uploaded"));
-        }
-
-        String username = getUsernameFromAuth();
-        List<Map<String, String>> successfulUploads = new ArrayList<>();
-        List<Map<String, String>> failedUploads = new ArrayList<>();
-
-        for (MultipartFile file : files) {
-            if (!file.isEmpty()) {
-                try {
-                    successfulUploads.add(uploadSingleFile(file, event, username));
-                } catch (IOException e) {
-                    String originalFilename = file.getOriginalFilename();
-                    logger.error("Failed to upload a file in multi-upload batch: {}", originalFilename, e);
-                    failedUploads.add(Map.of(
-                            "fileName", originalFilename != null ? originalFilename : "unknown",
-                            "error", e.getMessage()
-                    ));
-                }
+            if (fileName == null || fileName.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "fileName is required"));
             }
+            if (contentType == null || contentType.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "contentType is required"));
+            }
+            if (event == null || event.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "event is required"));
+            }
+
+            String username = getUsernameFromAuth();
+            
+            // Sanitize the filename to prevent path traversal and other attacks
+            String sanitizedFilename = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+            String blobPath = event + "/" + username + "/" + sanitizedFilename;
+
+            // Generate signed URL for upload
+            String signedUrl = gcsSignedUrlService.generateSignedUploadUrl(blobPath, contentType);
+
+            logger.info("Generated signed upload URL for: {}", blobPath);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("signedUrl", signedUrl);
+            response.put("blobPath", blobPath);
+            response.put("fileName", sanitizedFilename);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Failed to generate signed upload URL", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to generate signed upload URL: " + e.getMessage()));
         }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Batch upload process completed.");
-        response.put("successfulUploads", successfulUploads);
-        response.put("failedUploads", failedUploads);
-
-        return ResponseEntity.ok(response);
     }
 
     /**
-     * Private helper to handle the logic for uploading one file to GCS.
-     *
-     * @return A map containing the blobPath and publicUrl.
-     * @throws IOException if the upload fails.
+     * Generate signed URLs for multiple file uploads.
+     * Frontend will use these URLs to upload directly to GCS.
      */
-    private Map<String, String> uploadSingleFile(MultipartFile file, String event, String username) throws IOException {
-        // Sanitize the filename to prevent path traversal and other attacks
-        String originalFilename = file.getOriginalFilename();
-        String sanitizedFilename = (originalFilename != null)
-                ? originalFilename.replaceAll("[^a-zA-Z0-9._-]", "_")
-                : "file_upload";
+    @PostMapping("/generate-multi-upload-urls")
+    public ResponseEntity<Map<String, Object>> generateMultiUploadUrls(@RequestBody Map<String, Object> request) {
+        try {
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> files = (List<Map<String, String>>) request.get("files");
+            String event = (String) request.get("event");
 
-        String blobPath = event + "/" + username + "/" + sanitizedFilename;
+            if (files == null || files.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "files array is required"));
+            }
+            if (event == null || event.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "event is required"));
+            }
 
-        BlobId blobId = BlobId.of(bucketName, blobPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType(file.getContentType())
-                .build();
-        storage.create(blobInfo, file.getBytes());
+            String username = getUsernameFromAuth();
+            List<Map<String, String>> uploadUrls = new ArrayList<>();
 
-        String publicUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, blobPath);
+            for (Map<String, String> fileInfo : files) {
+                String fileName = fileInfo.get("fileName");
+                String contentType = fileInfo.get("contentType");
 
-        return Map.of(
-                "blobPath", blobPath,
-                "publicUrl", publicUrl
-        );
+                if (fileName == null || fileName.isEmpty() || contentType == null || contentType.isEmpty()) {
+                    logger.warn("Skipping file with missing fileName or contentType");
+                    continue;
+                }
+
+                // Sanitize the filename
+                String sanitizedFilename = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+                String blobPath = event + "/" + username + "/" + sanitizedFilename;
+
+                // Generate signed URL
+                String signedUrl = gcsSignedUrlService.generateSignedUploadUrl(blobPath, contentType);
+
+                Map<String, String> urlInfo = new HashMap<>();
+                urlInfo.put("fileName", sanitizedFilename);
+                urlInfo.put("signedUrl", signedUrl);
+                urlInfo.put("blobPath", blobPath);
+
+                uploadUrls.add(urlInfo);
+            }
+
+            logger.info("Generated {} signed upload URLs", uploadUrls.size());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("uploadUrls", uploadUrls);
+            response.put("count", uploadUrls.size());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Failed to generate signed upload URLs", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to generate signed upload URLs: " + e.getMessage()));
+        }
     }
 
     // ... listImages and getUsernameFromAuth methods remain the same
