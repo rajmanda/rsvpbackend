@@ -17,6 +17,7 @@ public class GcsSignedUrlService {
 
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final ServiceAccountSigner signer;
+<<<<<<< HEAD
     private final String bucketName;
     private final String signerEmail;
 
@@ -30,6 +31,15 @@ public class GcsSignedUrlService {
         this.signerEmail = signerEmail;
         
         // Now validate
+=======
+
+    @Value("${gcs.bucket-name}")
+    private String bucketName;
+
+    @Autowired
+    // Corrected the @Value annotation to use the property key from application.yaml
+    public GcsSignedUrlService(@Value("${gcs.signer-sa-email}") String signerEmail) throws IOException {
+>>>>>>> f6b1fc16242426b3236c743f5ff5246c2a5e2f60
         if (signerEmail == null || signerEmail.isBlank()) {
             throw new IllegalArgumentException("GCS signer service account email (gcs.signer-sa-email) must be configured for signing URLs.");
         }
