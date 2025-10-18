@@ -1,18 +1,18 @@
 package com.gala.celebrations.rsvpbackend.controller;
 
+import com.gala.celebrations.rsvpbackend.service.GcsSignedUrlService;
 import com.google.api.gax.paging.Page;
 import com.google.cloud.storage.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +24,9 @@ public class FileUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
+
+    @Autowired
+    private GcsSignedUrlService gcsSignedUrlService;
 
     @Value("${gcs.bucket-name}")
     private String bucketName;
