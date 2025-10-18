@@ -1,17 +1,48 @@
 package com.gala.celebrations.rsvpbackend.service;
 
+import com.google.auth.ServiceAccountSigner;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.ImpersonatedCredentials;
 import com.google.cloud.storage.*;
+import com.google.common.collect.ImmutableList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class GcsSignedUrlService {
 
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
+    private final ServiceAccountSigner signer;
 
     @Value("${gcs.bucket-name}")
     private String bucketName;
+
+    @Value("${gcs.signer-sa-email}")
+    private String signerEmail;
+
+    @Autowired
+    // Corrected the @Value annotation to use the property key from application.yaml
+    public GcsSignedUrlService() throws IOException {
+        if (signerEmail == null || signerEmail.isBlank()) {
+            throw new IllegalArgumentException("GCS signer service account email (gcs.signer-sa-email) must be configured for signing URLs.");
+        }
+
+        // Use Application Default Credentials to get the identity of the principal running the application.
+        GoogleCredentials sourceCredentials = GoogleCredentials.getApplicationDefault();
+
+        // Create impersonated credentials. This object will act as a signer, using the IAM API
+        // to request signatures from the target service account. The principal (from sourceCredentials)
+        // must have the "Service Account Token Creator" role on the target service account (signerEmail).
+        this.signer = ImpersonatedCredentials.newBuilder()
+                .setSourceCredentials(sourceCredentials)
+                .setTargetPrincipal(signerEmail)
+                .setScopes(ImmutableList.of("https://www.googleapis.com/auth/cloud-platform"))
+                .build();
+    }
 
     /**
      * Generates a signed URL for direct upload to GCS.
@@ -24,11 +55,13 @@ public class GcsSignedUrlService {
                 .setContentType(contentType)
                 .build();
 
+        // Use the signer to create the V4 signature via the IAM API.
         return storage.signUrl(
                 blobInfo,
                 15, TimeUnit.MINUTES,
                 Storage.SignUrlOption.httpMethod(HttpMethod.PUT),
-                Storage.SignUrlOption.withV4Signature()
+                Storage.SignUrlOption.withV4Signature(),
+                Storage.SignUrlOption.signWith(this.signer)
         ).toString();
     }
 
@@ -40,12 +73,13 @@ public class GcsSignedUrlService {
     public String generateSignedReadUrl(String objectName) {
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName).build();
 
+        // Use the same signer for read URLs.
         return storage.signUrl(
                 blobInfo,
                 1, TimeUnit.HOURS,
                 Storage.SignUrlOption.httpMethod(HttpMethod.GET),
-                Storage.SignUrlOption.withV4Signature()
+                Storage.SignUrlOption.withV4Signature(),
+                Storage.SignUrlOption.signWith(this.signer)
         ).toString();
     }
 }
-
