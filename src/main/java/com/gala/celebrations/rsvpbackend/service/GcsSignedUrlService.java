@@ -31,5 +31,21 @@ public class GcsSignedUrlService {
                 Storage.SignUrlOption.withV4Signature()
         ).toString();
     }
+
+    /**
+     * Generates a signed URL for reading/downloading from GCS.
+     * @param objectName path of the object in the bucket
+     * @return A time-limited signed URL (HTTP GET) valid for 1 hour
+     */
+    public String generateSignedReadUrl(String objectName) {
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName).build();
+
+        return storage.signUrl(
+                blobInfo,
+                1, TimeUnit.HOURS,
+                Storage.SignUrlOption.httpMethod(HttpMethod.GET),
+                Storage.SignUrlOption.withV4Signature()
+        ).toString();
+    }
 }
 
