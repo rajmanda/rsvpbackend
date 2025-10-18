@@ -5,31 +5,40 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ImpersonatedCredentials;
 import com.google.cloud.storage.*;
 import com.google.common.collect.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class GcsSignedUrlService {
 
+    // Add a logger
+    private static final Logger logger = LoggerFactory.getLogger(GcsSignedUrlService.class);
+
     private final Storage storage = StorageOptions.getDefaultInstance().getService();
     private final ServiceAccountSigner signer;
-    private final String bucketName;
+
+    @Value("${gcs.bucket-name}")
+    private String bucketName;
 
     @Autowired
-    public GcsSignedUrlService(@Value("${gcs.bucket-name}") String bucketName,
-                               @Value("${gcs.signer-sa-email}") String signerEmail) throws IOException {
-        this.bucketName = bucketName;
-        
+    public GcsSignedUrlService(@Value("${gcs.signer-sa-email}") String signerEmail) throws IOException {
         if (signerEmail == null || signerEmail.isBlank()) {
             throw new IllegalArgumentException("GCS signer service account email (gcs.signer-sa-email) must be configured for signing URLs.");
         }
 
         // Use Application Default Credentials to get the identity of the principal running the application.
         GoogleCredentials sourceCredentials = GoogleCredentials.getApplicationDefault();
+
+        // --- Add this diagnostic log line ---
+        logger.info("GCS signing will be performed by principal [{}] impersonating service account [{}].", sourceCredentials, signerEmail);
 
         // Create impersonated credentials. This object will act as a signer, using the IAM API
         // to request signatures from the target service account. The principal (from sourceCredentials)
@@ -52,12 +61,19 @@ public class GcsSignedUrlService {
                 .setContentType(contentType)
                 .build();
 
+        // Define the headers that must be included in the client's upload request.
+        // By including 'Content-Type', we enforce that the client uploads a file
+        // with the exact MIME type we are authorizing. This is a security best practice.
+        Map<String, String> extensionHeaders = new HashMap<>();
+        extensionHeaders.put("Content-Type", contentType);
+
         // Use the signer to create the V4 signature via the IAM API.
         return storage.signUrl(
                 blobInfo,
                 15, TimeUnit.MINUTES,
                 Storage.SignUrlOption.httpMethod(HttpMethod.PUT),
                 Storage.SignUrlOption.withV4Signature(),
+                Storage.SignUrlOption.withExtHeaders(extensionHeaders), // Include Content-Type in the signature
                 Storage.SignUrlOption.signWith(this.signer)
         ).toString();
     }

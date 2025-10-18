@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,10 +33,7 @@ public class FileUploadController {
     @Value("${gcs.bucket-name}")
     private String bucketName;
 
-    /**
-     * Generate a signed URL for single file upload.
-     * Frontend will use this URL to upload directly to GCS.
-     */
+    // ... (your other controller methods like generateUploadUrl remain the same) ...
     @PostMapping("/generate-upload-url")
     public ResponseEntity<Map<String, String>> generateUploadUrl(@RequestBody Map<String, String> request) {
         try {
@@ -53,7 +52,7 @@ public class FileUploadController {
             }
 
             String username = getUsernameFromAuth();
-            
+
             // Sanitize the filename to prevent path traversal and other attacks
             String sanitizedFilename = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
             String blobPath = event + "/" + username + "/" + sanitizedFilename;
@@ -61,7 +60,9 @@ public class FileUploadController {
             // Generate signed URL for upload
             String signedUrl = gcsSignedUrlService.generateSignedUploadUrl(blobPath, contentType);
 
-            logger.info("Generated signed upload URL for: {}", blobPath);
+            // --- IMPROVED LOGGING ---
+            // Log the full GCS path where the object will be uploaded.
+            logger.info("Generated signed URL for upload to: gs://{}/{}", bucketName, blobPath);
 
             Map<String, String> response = new HashMap<>();
             response.put("signedUrl", signedUrl);
@@ -76,10 +77,6 @@ public class FileUploadController {
         }
     }
 
-    /**
-     * Generate signed URLs for multiple file uploads.
-     * Frontend will use these URLs to upload directly to GCS.
-     */
     @PostMapping("/generate-multi-upload-urls")
     public ResponseEntity<Map<String, Object>> generateMultiUploadUrls(@RequestBody Map<String, Object> request) {
         try {
@@ -113,6 +110,10 @@ public class FileUploadController {
                 // Generate signed URL
                 String signedUrl = gcsSignedUrlService.generateSignedUploadUrl(blobPath, contentType);
 
+                // --- ADDED LOGGING ---
+                // Log the full GCS path for each file.
+                logger.info("Generated signed URL for upload to: gs://{}/{}", bucketName, blobPath);
+
                 Map<String, String> urlInfo = new HashMap<>();
                 urlInfo.put("fileName", sanitizedFilename);
                 urlInfo.put("signedUrl", signedUrl);
@@ -121,7 +122,7 @@ public class FileUploadController {
                 uploadUrls.add(urlInfo);
             }
 
-            logger.info("Generated {} signed upload URLs", uploadUrls.size());
+            logger.info("Generated a total of {} signed upload URLs for event '{}' and user '{}'", uploadUrls.size(), event, username);
 
             Map<String, Object> response = new HashMap<>();
             response.put("uploadUrls", uploadUrls);
@@ -186,16 +187,52 @@ public class FileUploadController {
         }
     }
 
+    /**
+     * Extracts the username (email) from the security context in a robust way,
+     * handling different types of OAuth2 principals.
+     * @return The user's email or 'anonymous' if not found.
+     */
+    // In FileUploadController.java
+
     private String getUsernameFromAuth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
-            logger.debug("JWT Claims: {}", jwt.getClaims());
-            String username = jwt.getClaimAsString("email");
+
+        // --- ADD THIS LOG LINE ---
+        logger.info("Authentication object from SecurityContext: {}", authentication);
+
+        if (authentication == null) {
+            return "anonymous";
+        }
+
+        Object principal = authentication.getPrincipal();
+        String username = null;
+
+        if (principal instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
+            // ... (rest of the method is the same)
+            logger.debug("Extracting username from JWT principal.");
+            username = jwt.getClaimAsString("email");
             if (username == null) {
                 username = jwt.getClaimAsString("sub");
             }
-            return username != null ? username : "anonymous";
+        } else if (principal instanceof OidcUser oidcUser) {
+            logger.debug("Extracting username from OidcUser principal.");
+            username = oidcUser.getEmail();
+            if (username == null) {
+                username = oidcUser.getSubject();
+            }
+        } else if (principal instanceof OAuth2User oauth2User) {
+            logger.debug("Extracting username from generic OAuth2User principal.");
+            username = oauth2User.getAttribute("email");
+            if (username == null) {
+                username = oauth2User.getName();
+            }
         }
-        return "anonymous";
+
+        if (username == null) {
+            logger.warn("Could not determine username from principal of type: {}. Principal details: {}", principal.getClass().getName(), principal);
+            return "anonymous";
+        }
+
+        return username;
     }
 }
