@@ -135,7 +135,10 @@ public class FileUploadController {
         }
     }
 
-    // ... listImages and getUsernameFromAuth methods remain the same
+    /**
+     * List images from GCS with signed URLs for secure access.
+     * Returns time-limited signed URLs instead of public URLs.
+     */
     @GetMapping("/list-images")
     public ResponseEntity<Map<String, Object>> listImages(
             @RequestParam(required = false) String eventName,
@@ -163,9 +166,9 @@ public class FileUploadController {
 
             for (Blob blob : blobs.iterateAll()) {
                 if (!blob.isDirectory()) { // Exclude directories
-                    String publicUrl = String.format("https://storage.googleapis.com/%s/%s",
-                            bucketName, blob.getName());
-                    imageUrls.add(publicUrl);
+                    // Generate signed URL for each image (valid for 1 hour)
+                    String signedUrl = gcsSignedUrlService.generateSignedReadUrl(blob.getName());
+                    imageUrls.add(signedUrl);
                 }
             }
 
@@ -173,11 +176,13 @@ public class FileUploadController {
             response.put("images", imageUrls);
             response.put("count", imageUrls.size());
 
+            logger.info("Listed {} images with signed URLs", imageUrls.size());
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Failed to list images from GCS", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to list images from GCS"));
+                    .body(Map.of("error", "Failed to list images from GCS: " + e.getMessage()));
         }
     }
 
