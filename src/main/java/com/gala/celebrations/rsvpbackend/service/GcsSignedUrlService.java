@@ -21,12 +21,9 @@ public class GcsSignedUrlService {
     @Value("${gcs.bucket-name}")
     private String bucketName;
 
-    @Value("${gcs.signer-sa-email}")
-    private String signerEmail;
-
     @Autowired
     // Corrected the @Value annotation to use the property key from application.yaml
-    public GcsSignedUrlService() throws IOException {
+    public GcsSignedUrlService(@Value("${gcs.signer-sa-email}") String signerEmail) throws IOException {
         if (signerEmail == null || signerEmail.isBlank()) {
             throw new IllegalArgumentException("GCS signer service account email (gcs.signer-sa-email) must be configured for signing URLs.");
         }
