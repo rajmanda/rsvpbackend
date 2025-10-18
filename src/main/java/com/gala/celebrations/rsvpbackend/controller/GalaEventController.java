@@ -4,25 +4,27 @@ package com.gala.celebrations.rsvpbackend.controller;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDTO;
 import com.gala.celebrations.rsvpbackend.dto.GalaEventDetails;
 import com.gala.celebrations.rsvpbackend.service.GalaEventService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/gala-event")
-
 public class GalaEventController {
 
+    private static final Logger logger = LoggerFactory.getLogger(GalaEventController.class);
+
     @Autowired
-    GalaEventService galaEventService ;
+    GalaEventService galaEventService;
 
     @PostMapping("/save-gala-event")
-    public ResponseEntity<GalaEventDTO> saveOrder(@RequestBody GalaEventDetails galaEventDetails){
-        System.out.println(galaEventDetails);
+    public ResponseEntity<GalaEventDTO> saveOrder(@RequestBody GalaEventDetails galaEventDetails) {
+        logger.info("Received request to save gala event: {}", galaEventDetails.getName());
         GalaEventDTO galaEventSavedInDB = galaEventService.saveGalaEventInDB("galaEvent", galaEventDetails);
         return new ResponseEntity<>(galaEventSavedInDB, HttpStatus.CREATED);
     }
@@ -33,25 +35,18 @@ public class GalaEventController {
         return new ResponseEntity<>(galaEvents, HttpStatus.OK);
     }
 
-    // @DeleteMapping("/delete-all-gala-Events")
-    // public ResponseEntity<Void> deleteAllgalaEvents() {
-    //     //galaEventService.deleteAllGalaEvents();
-    //     return new ResponseEntity<>(HttpStatus.OK);
-    // }
-
     @DeleteMapping("/delete-gala-event/{id}")
     public ResponseEntity<Void> deleteGalaEventById(@PathVariable int id) {
         try {
-            galaEventService.deleteById(id);
+            // Corrected method call from deleteById to deactivateGalaEventById
+            galaEventService.deactivateGalaEventById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            // Log the exception (optional)
-            System.out.println("Error deleting gala event with id: " + id);
-            System.out.println("Error deleting gala event with id: " + e.getMessage());
+        } catch (RuntimeException e) {
+            logger.error("Error deactivating gala event with id: {}", id, e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    // Update an existing GalaEvent
+
     @PutMapping("/update-gala-event/{id}")
     public ResponseEntity<GalaEventDTO> updateGalaEvent(
             @PathVariable int id,
@@ -60,9 +55,7 @@ public class GalaEventController {
             GalaEventDTO updatedGalaEvent = galaEventService.updateGalaEvent(id, updatedDetails);
             return new ResponseEntity<>(updatedGalaEvent, HttpStatus.OK);
         } catch (RuntimeException e) {
-            // Log the exception (optional)
-            System.out.println("Error updating gala event with id: " + id);
-            System.out.println("Error message: " + e.getMessage());
+            logger.error("Error updating gala event with id: {}", id, e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

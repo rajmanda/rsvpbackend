@@ -33,7 +33,6 @@ public class FileUploadController {
     @Value("${gcs.bucket-name}")
     private String bucketName;
 
-    // ... (your other controller methods like generateUploadUrl remain the same) ...
     @PostMapping("/generate-upload-url")
     public ResponseEntity<Map<String, String>> generateUploadUrl(@RequestBody Map<String, String> request) {
         try {
@@ -53,20 +52,18 @@ public class FileUploadController {
 
             String username = getUsernameFromAuth();
 
-            // Sanitize the filename to prevent path traversal and other attacks
             String sanitizedFilename = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
             String blobPath = event + "/" + username + "/" + sanitizedFilename;
+            String gcsUri = String.format("gs://%s/%s", bucketName, blobPath);
 
-            // Generate signed URL for upload
             String signedUrl = gcsSignedUrlService.generateSignedUploadUrl(blobPath, contentType);
 
-            // --- IMPROVED LOGGING ---
-            // Log the full GCS path where the object will be uploaded.
-            logger.info("Generated signed URL for upload to: gs://{}/{}", bucketName, blobPath);
+            logger.info("Generated signed URL for upload to: {}", gcsUri);
 
             Map<String, String> response = new HashMap<>();
             response.put("signedUrl", signedUrl);
-            response.put("blobPath", blobPath);
+            // Return the full GCS URI so it can be saved in the database
+            response.put("blobPath", gcsUri);
             response.put("fileName", sanitizedFilename);
 
             return ResponseEntity.ok(response);
@@ -103,21 +100,19 @@ public class FileUploadController {
                     continue;
                 }
 
-                // Sanitize the filename
                 String sanitizedFilename = fileName.replaceAll("[^a-zA-Z0-9._-]", "_");
                 String blobPath = event + "/" + username + "/" + sanitizedFilename;
+                String gcsUri = String.format("gs://%s/%s", bucketName, blobPath);
 
-                // Generate signed URL
                 String signedUrl = gcsSignedUrlService.generateSignedUploadUrl(blobPath, contentType);
 
-                // --- ADDED LOGGING ---
-                // Log the full GCS path for each file.
-                logger.info("Generated signed URL for upload to: gs://{}/{}", bucketName, blobPath);
+                logger.info("Generated signed URL for upload to: {}", gcsUri);
 
                 Map<String, String> urlInfo = new HashMap<>();
                 urlInfo.put("fileName", sanitizedFilename);
                 urlInfo.put("signedUrl", signedUrl);
-                urlInfo.put("blobPath", blobPath);
+                // Return the full GCS URI
+                urlInfo.put("blobPath", gcsUri);
 
                 uploadUrls.add(urlInfo);
             }
@@ -136,37 +131,38 @@ public class FileUploadController {
         }
     }
 
-    /**
-     * Generate a signed download URL for a specific blob path.
-     * This endpoint is used by the frontend to get viewable URLs for uploaded images.
-     */
     @PostMapping("/generate-download-url")
     public ResponseEntity<Map<String, String>> generateDownloadUrl(@RequestBody Map<String, String> request) {
         try {
-            String blobPath = request.get("blobPath");
+            String fullPath = request.get("blobPath");
 
-            if (blobPath == null || blobPath.isEmpty()) {
+            if (fullPath == null || fullPath.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "blobPath is required"));
             }
 
-            // Validate that the blob exists (optional but recommended)
-            BlobId blobId = BlobId.of(bucketName, blobPath);
-            Blob blob = storage.get(blobId);
-            
-            if (blob == null || !blob.exists()) {
-                logger.warn("Requested blob does not exist: {}", blobPath);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "File not found: " + blobPath));
+            // Parse the full GCS URI to get the relative path for the service
+            String relativeBlobPath = parseGcsUri(fullPath);
+            if (relativeBlobPath == null) {
+                logger.warn("Invalid GCS URI format provided: {}", fullPath);
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid blobPath format. Expected gs://<bucket>/<path>"));
             }
 
-            // Generate signed URL for viewing/downloading (valid for 1 hour)
-            String signedUrl = gcsSignedUrlService.generateSignedReadUrl(blobPath);
+            BlobId blobId = BlobId.of(bucketName, relativeBlobPath);
+            Blob blob = storage.get(blobId);
 
-            logger.info("Generated signed download URL for blob: {}", blobPath);
+            if (blob == null || !blob.exists()) {
+                logger.warn("Requested blob does not exist: {}", relativeBlobPath);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "File not found: " + relativeBlobPath));
+            }
+
+            String signedUrl = gcsSignedUrlService.generateSignedReadUrl(relativeBlobPath);
+
+            logger.info("Generated signed download URL for blob: {}", relativeBlobPath);
 
             Map<String, String> response = new HashMap<>();
             response.put("signedUrl", signedUrl);
-            response.put("blobPath", blobPath);
+            response.put("blobPath", fullPath); // Return the original full path
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -176,10 +172,6 @@ public class FileUploadController {
         }
     }
 
-    /**
-     * List images from GCS with signed URLs for secure access.
-     * Returns time-limited signed URLs instead of public URLs.
-     */
     @GetMapping("/list-images")
     public ResponseEntity<Map<String, Object>> listImages(
             @RequestParam(required = false) String eventName,
@@ -206,8 +198,7 @@ public class FileUploadController {
             Page<Blob> blobs = storage.list(bucketName, options.toArray(new Storage.BlobListOption[0]));
 
             for (Blob blob : blobs.iterateAll()) {
-                if (!blob.isDirectory()) { // Exclude directories
-                    // Generate signed URL for each image (valid for 1 hour)
+                if (!blob.isDirectory()) {
                     String signedUrl = gcsSignedUrlService.generateSignedReadUrl(blob.getName());
                     imageUrls.add(signedUrl);
                 }
@@ -228,18 +219,27 @@ public class FileUploadController {
     }
 
     /**
-     * Extracts the username (email) from the security context in a robust way,
-     * handling different types of OAuth2 principals.
-     * @return The user's email or 'anonymous' if not found.
+     * Parses a GCS URI (gs://bucket/path) to extract the relative object path.
+     * Also handles plain relative paths for backward compatibility.
+     * @param path The full GCS URI or a relative path.
+     * @return The relative object path, or null if the format is invalid.
      */
-    // In FileUploadController.java
+    private String parseGcsUri(String path) {
+        String prefix = String.format("gs://%s/", this.bucketName);
+        if (path != null && path.startsWith(prefix)) {
+            return path.substring(prefix.length());
+        }
+        // Handle the old relative path format for backward compatibility
+        if (path != null && !path.startsWith("gs://")) {
+            return path;
+        }
+        // Return null if the format is invalid (e.g., gs://wrong-bucket/...)
+        return null;
+    }
 
     private String getUsernameFromAuth() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // --- ADD THIS LOG LINE ---
         logger.info("Authentication object from SecurityContext: {}", authentication);
-
         if (authentication == null) {
             return "anonymous";
         }
@@ -248,7 +248,6 @@ public class FileUploadController {
         String username = null;
 
         if (principal instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
-            // ... (rest of the method is the same)
             logger.debug("Extracting username from JWT principal.");
             username = jwt.getClaimAsString("email");
             if (username == null) {
