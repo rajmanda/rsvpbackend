@@ -37,4 +37,11 @@ rsvpbackend-deployment.yaml
 .history
 
 ##Local profile with passwords.
-/src/main/resources/application-local.yaml
+/src/main/resources/application-local.yaml-e 
+# Environment files
+*.env
+*.env.*
+-e 
+# Environment files
+*.env
+*.env.*

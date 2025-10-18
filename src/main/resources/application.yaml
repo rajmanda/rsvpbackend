@@ -50,4 +50,6 @@ management:
       enabled: true
 
 gcs:
-  bucket-name: ${GCS_BUCKET_NAME:shravani_kalyanam_bucket}
+#  bucket-name: ${GCS_BUCKET_NAME:shravani_kalyanam_bucket}
+  bucket-name: ${GCS_BUCKET_NAME:kalyanam_bucket}
+  signer-sa-email: ${GCS_SIGNER_SA_EMAIL:gcp-secret-accessor@properties-app-418208.iam.gserviceaccount.com}
