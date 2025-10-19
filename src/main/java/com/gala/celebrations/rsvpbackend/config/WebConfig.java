@@ -11,8 +11,9 @@ import org.springframework.lang.NonNull;
 public class WebConfig implements WebMvcConfigurer {
 
     // Injects the comma-separated list of URLs from your application.yaml
-    @Value("${app.cors.allowed-origins}")
+    @Value("#{'${app.cors.allowed-origins}'.split(',')}")
     private String[] allowedOrigins;
+
 
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {
