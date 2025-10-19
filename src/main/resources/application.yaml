@@ -53,3 +53,10 @@ gcs:
 #  bucket-name: ${GCS_BUCKET_NAME:shravani_kalyanam_bucket}
   bucket-name: ${GCS_BUCKET_NAME:kalyanam_bucket}
   signer-sa-email: ${GCS_SIGNER_SA_EMAIL:gcp-secret-accessor@properties-app-418208.iam.gserviceaccount.com}
+
+# Add this new section for application-specific configurations
+app:
+  cors:
+    # This will be overridden by the CORS_ALLOWED_ORIGINS environment variable in Cloud Run.
+    # Default is set to the Angular default for local development.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
