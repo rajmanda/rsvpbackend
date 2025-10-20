@@ -45,25 +45,25 @@ public class MongoConfig {
         this.environment = environment;
     }
 
-    @PostConstruct
-    public void init() throws IOException {
-        if (!"local".equals(activeProfile)) {
-            try {
-                // Use the logger
-                logger.debug("Reading MongoDB password from file path: {}", mongoPasswordFilePath);
-                mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
-                logger.debug("MongoDB password loaded successfully from file.");
-            } catch (NoSuchFileException e) {
-                logger.warn("MongoDB password file not found at '{}'. Falling back to environment variable.", mongoPasswordFilePath);
-                mongoPassword = environment.getProperty("MONGODB_PASSWORD", ""); // Use a more specific env var
-            }
-            // ...
-            mongoUri = mongoUri.replace("<password>", mongoPassword); // Note: I corrected the placeholder from :<password> to <password> to match the URI
-            logger.info("MongoDB URI has been dynamically configured.");
-        } else {
-            logger.debug("Active profile is 'local', skipping dynamic password fetch for MongoDB.");
-        }
-    }
+//    @PostConstruct
+//    public void init() throws IOException {
+//        if (!"local".equals(activeProfile)) {
+//            try {
+//                // Use the logger
+//                logger.debug("Reading MongoDB password from file path: {}", mongoPasswordFilePath);
+//                mongoPassword = new String(Files.readAllBytes(Paths.get(mongoPasswordFilePath))).trim();
+//                logger.debug("MongoDB password loaded successfully from file.");
+//            } catch (NoSuchFileException e) {
+//                logger.warn("MongoDB password file not found at '{}'. Falling back to environment variable.", mongoPasswordFilePath);
+//                mongoPassword = environment.getProperty("MONGODB_PASSWORD", ""); // Use a more specific env var
+//            }
+//            // ...
+//            mongoUri = mongoUri.replace("<password>", mongoPassword); // Note: I corrected the placeholder from :<password> to <password> to match the URI
+//            logger.info("MongoDB URI has been dynamically configured.");
+//        } else {
+//            logger.debug("Active profile is 'local', skipping dynamic password fetch for MongoDB.");
+//        }
+//    }
 
 
     @Bean
