@@ -33,7 +33,7 @@ spring:
     passwordFilePath: ${MAIL_PASSWORD_FILE:/etc/secrets/gmail_password}
     properties:
       mail:
-        debug: false
+#        debug: true
         smtp:
           auth: true
           starttls:
