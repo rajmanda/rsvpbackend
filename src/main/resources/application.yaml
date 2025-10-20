@@ -52,7 +52,7 @@ management:
 gcs:
 #  bucket-name: ${GCS_BUCKET_NAME:shravani_kalyanam_bucket}
   bucket-name: ${GCS_BUCKET_NAME:kalyanam_bucket_2025}
-  signer-sa-email: ${GCS_SIGNER_SA_EMAIL:gcp-secret-accessor@properties-app-418208.iam.gserviceaccount.com}
+  signer-sa-email: ${GCS_SIGNER_SA_EMAIL:gcs-signer-sa@properties-app-418208.iam.gserviceaccount.com}
 
 # Add this new section for application-specific configurations
 app:
