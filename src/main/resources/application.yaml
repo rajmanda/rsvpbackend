@@ -25,6 +25,7 @@ spring:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}
       database: ${MONGODB_DATABASE:galadb}
   mail:
+    cc-recipients: ${APP_MAIL_CC_RECIPIENTS:raj3766@yahoo.com}
     host: smtp.gmail.com
     port: 587
     password: ${SPRING_MAIL_PASSWORD:default-password-for-non-dev-or-placeholder}
