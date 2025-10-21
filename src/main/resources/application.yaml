@@ -25,7 +25,6 @@ spring:
       uri: ${SPRING_DATA_MONGODB_URI:mongodb+srv://galaDbUser:<password>@cluster0.sod5j.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0}
       database: ${MONGODB_DATABASE:galadb}
   mail:
-    cc-recipients: ${APP_MAIL_CC_RECIPIENTS:raj3766@yahoo.com}
     host: smtp.gmail.com
     port: 587
     password: ${SPRING_MAIL_PASSWORD:default-password-for-non-dev-or-placeholder}
@@ -57,6 +56,8 @@ gcs:
 
 # Add this new section for application-specific configurations
 app:
+  mail:
+    cc-recipients: ${APP_MAIL_CC_RECIPIENTS:raj3766@yahoo.com}
   cors:
     # This will be overridden by the CORS_ALLOWED_ORIGINS environment variable in Cloud Run.
     # Default is set to the Angular default for local development.
